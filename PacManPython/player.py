@@ -1,25 +1,22 @@
 import glob
 import pygame
 import datetime
-
+from board import Board
 
 # 0 -prawo,1-goora,2-lewo,3-dol moje
 
-class Player():
-    def __init__(self,screen,board,lives,score):
+class Player(Board):
+    def __init__(self,screen,board,lives,score,width,height):
+        super().__init__(screen,width,height,board)
         self.player_list = [pygame.transform.scale(pygame.image.load(i), (45, 45)) for i in glob.glob("player_png/*.png")]
         self.counter = 0
         self.angle = 0
         self.direction = -1
         self.x=430
         self.y=664
-        self.screen=screen
         self.can_move = [False,False,False,False]
-        self.board = board
         self.score = 0
         self.lives = lives
-        self.temp_height = (self.board.heigth - 50) // 32
-        self.temp_width = self.board.width // 30
         self.padding_walls = 15
         self.detect_walls = 23
         self.kontrolka = None
@@ -34,28 +31,28 @@ class Player():
 
         if direct == 0 :
             if self.can_move[direct] and 12 <= center_y % self.temp_height <= 18 \
-                    and self.board.board[center_y//self.temp_height][(center_x // self.temp_width)+1] < 3 :
+                    and self.board[center_y//self.temp_height][(center_x // self.temp_width)+1] < 3 :
                 self.direction = direct
                 self.kontrolka = None
             else:
                 self.kontrolka = direct
         if direct == 2 :
             if self.can_move[direct] and 12 <= center_y % self.temp_height <= 18 \
-                    and self.board.board[center_y//self.temp_height][(center_x // self.temp_width)-1] <3 :
+                    and self.board[center_y//self.temp_height][(center_x // self.temp_width)-1] <3 :
                 self.direction = direct
                 self.kontrolka = None
             else:
                 self.kontrolka = direct
         if direct == 1 :
             if self.can_move[direct] and 12 < center_x % self.temp_width < 18 \
-                    and self.board.board[(center_y//self.temp_height)-1][center_x // self.temp_width] <3 :
+                    and self.board[(center_y//self.temp_height)-1][center_x // self.temp_width] <3 :
                 self.direction = direct
                 self.kontrolka = None
             else:
                 self.kontrolka = direct
         if direct == 3:
             if self.can_move[direct] and 12 < center_x % self.temp_width < 18 \
-                    and self.board.board[(center_y//self.temp_height)+1][center_x // self.temp_width] <3 :
+                    and self.board[(center_y//self.temp_height)+1][center_x // self.temp_width] <3 :
                 self.direction = direct
                 self.kontrolka = None
             else:
@@ -66,16 +63,16 @@ class Player():
         center_x = self.x + 22
         center_y = self.y + 22
 
-        if self.kontrolka == 0 and self.can_move[0] and self.board.board[center_y//self.temp_height][(center_x // self.temp_width)+1] <3  :
+        if self.kontrolka == 0 and self.can_move[0] and self.board[center_y//self.temp_height][(center_x // self.temp_width)+1] <3  :
             self.direction = self.kontrolka
             self.kontrolka = None
-        elif self.kontrolka == 1 and self.can_move[1] and self.board.board[(center_y//self.temp_height)-1][center_x // self.temp_width] <3:
+        elif self.kontrolka == 1 and self.can_move[1] and self.board[(center_y//self.temp_height)-1][center_x // self.temp_width] <3:
             self.direction = self.kontrolka
             self.kontrolka = None
-        elif self.kontrolka == 2 and self.can_move[2] and self.board.board[center_y//self.temp_height][(center_x // self.temp_width)-1] <3:
+        elif self.kontrolka == 2 and self.can_move[2] and self.board[center_y//self.temp_height][(center_x // self.temp_width)-1] <3:
             self.direction = self.kontrolka
             self.kontrolka = None
-        elif self.kontrolka == 3 and self.can_move[3] and self.board.board[(center_y//self.temp_height)+1][center_x // self.temp_width] <3:
+        elif self.kontrolka == 3 and self.can_move[3] and self.board[(center_y//self.temp_height)+1][center_x // self.temp_width] <3:
             self.direction = self.kontrolka
             self.kontrolka = None
 
@@ -93,8 +90,6 @@ class Player():
             self.angle = 270
 
     def show_animation(self):
-        center_x = self.x + 22
-        center_y = self.y + 22
         if self.counter >= len(self.player_list):
             self.counter = 0
 
@@ -118,24 +113,24 @@ class Player():
         if 1< center_x // self.temp_width <29:
 
             if 12 < center_x % self.temp_width < 18:
-                if self.board.board[(center_y - self.padding_walls) // self.temp_height][center_x // self.temp_width] < 3:
+                if self.board[(center_y - self.padding_walls) // self.temp_height][center_x // self.temp_width] < 3:
                     self.can_move[1] = True
-                if self.board.board[(center_y + self.padding_walls) // self.temp_height][center_x // self.temp_width] < 3:
+                if self.board[(center_y + self.padding_walls) // self.temp_height][center_x // self.temp_width] < 3:
                     self.can_move[3] = True
             if 13 <= center_y % self.temp_height <= 17:
-                if self.board.board[center_y // self.temp_height][(center_x - self.temp_width) // self.temp_width] < 3:
+                if self.board[center_y // self.temp_height][(center_x - self.temp_width) // self.temp_width] < 3:
                     self.can_move[2] = True
-                if self.board.board[center_y // self.temp_height][(center_x + self.temp_width) // self.temp_width] < 3:
+                if self.board[center_y // self.temp_height][(center_x + self.temp_width) // self.temp_width] < 3:
                     self.can_move[0] = True
             if 12 < center_x % self.temp_width < 18:
-                if self.board.board[(center_y - self.temp_height) // self.temp_height][center_x // self.temp_width] < 3:
+                if self.board[(center_y - self.temp_height) // self.temp_height][center_x // self.temp_width] < 3:
                     self.can_move[1] = True
-                if self.board.board[(center_y + self.temp_height) // self.temp_height][center_x // self.temp_width] < 3:
+                if self.board[(center_y + self.temp_height) // self.temp_height][center_x // self.temp_width] < 3:
                     self.can_move[3] = True
             if 13 <= center_y % self.temp_height <= 17:
-                if self.board.board[center_y // self.temp_height][(center_x - self.padding_walls) // self.temp_width] < 3:
+                if self.board[center_y // self.temp_height][(center_x - self.padding_walls) // self.temp_width] < 3:
                     self.can_move[2] = True
-                if self.board.board[center_y // self.temp_height][(center_x + self.padding_walls) // self.temp_width] < 3:
+                if self.board[center_y // self.temp_height][(center_x + self.padding_walls) // self.temp_width] < 3:
                     self.can_move[0] = True
         else:
             self.can_move = [True,False,True,False]
@@ -145,17 +140,15 @@ class Player():
                 self.x = 8
 
     def points_eaten(self):
-        temp_2 = (self.board.heigth - 50) // 32
-        temp_1 = self.board.width // 30
         center_x = self.x + 22
         center_y = self.y + 22
 
-        if self.board.board[center_y // temp_2][center_x  // temp_1] == 1:
-            self.board.board[center_y // temp_2][center_x  // temp_1] = 0
+        if self.board[center_y //  self.temp_height][center_x  // self.temp_width] == 1:
+            self.board[center_y //  self.temp_height][center_x  // self.temp_width] = 0
             self.score+=10
             self.full_score +=10
-        elif self.board.board[center_y // temp_2][center_x  // temp_1] == 2:
-            self.board.board[center_y // temp_2][center_x  // temp_1] = 0
+        elif self.board[center_y //  self.temp_height][center_x  // self.temp_width] == 2:
+            self.board[center_y //  self.temp_height][center_x  // self.temp_width] = 0
             self.power_up = True
             time_now = datetime.datetime.now()
             self.datetime = time_now.second

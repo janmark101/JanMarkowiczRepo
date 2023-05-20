@@ -1,23 +1,20 @@
 import pygame
 import random
-from player import Player
+from board import Board
 import datetime
 
-class Ghost():
-    def __init__(self,screen,board,img,x_pos,y_pos,speed):
+class Ghost(Board):
+    def __init__(self,screen,board,img,x_pos,y_pos,speed,width,height):
+        super().__init__(screen,width,height,board)
         self.ghost_png = pygame.transform.scale(pygame.image.load(f"ghost_png/{img}.png"), (45, 45))
         self.dead_ghost_png = pygame.transform.scale(pygame.image.load("ghost_png/dead.png"), (45,45))
         self.power_up_ghost = pygame.transform.scale(pygame.image.load("ghost_png/powerup.png"), (45,45))
-        self.screen = screen
-        self.board = board
         self.in_box = False
         self.x = x_pos
         self.y = y_pos
         self.dead = False
         self.avaible_moves = [False,False,False,False]
         self.direction = 0
-        self.temp_height = (self.board.heigth - 50) // 32
-        self.temp_width = self.board.width // 30
         self.padding_walls = 16
         self.random_direction = 0
         self.list_of_directions = []
@@ -26,8 +23,6 @@ class Ghost():
         self.is_next_direction = False
         self.datetime = None
         self.cooldown = False
-
-
 
 
     def availableMoves(self):
@@ -39,38 +34,38 @@ class Ghost():
         if 1 < center_x // self.temp_width < 29:
 
             if 13 <= center_x % self.temp_width <= 17:
-                if self.board.board[(center_y - self.padding_walls) // self.temp_height][center_x // self.temp_width] < 3:
+                if self.board[(center_y - self.padding_walls) // self.temp_height][center_x // self.temp_width] < 3:
                     self.avaible_moves[1] = True
-                if self.dead and self.board.board[(center_y + self.padding_walls) // self.temp_height][center_x // self.temp_width] == 9:
+                if self.dead and self.board[(center_y + self.padding_walls) // self.temp_height][center_x // self.temp_width] == 9:
                     self.avaible_moves[3] = True
-                if self.dead and self.board.board[(center_y + self.padding_walls) // self.temp_height][center_x // self.temp_width] <3:
+                if self.dead and self.board[(center_y + self.padding_walls) // self.temp_height][center_x // self.temp_width] <3:
                     self.avaible_moves[3] = True
                 if not self.dead:
-                    if self.board.board[(center_y + self.padding_walls) // self.temp_height][center_x // self.temp_width] < 3:
+                    if self.board[(center_y + self.padding_walls) // self.temp_height][center_x // self.temp_width] < 3:
                         self.avaible_moves[3] = True
-                    if self.cooldown and self.board.board[(center_y - self.padding_walls) // self.temp_height][center_x // self.temp_width] == 9:
+                    if self.cooldown and self.board[(center_y - self.padding_walls) // self.temp_height][center_x // self.temp_width] == 9:
                         self.avaible_moves[1] = True
             if 12 <= center_y % self.temp_height <= 16:
-                if self.board.board[center_y // self.temp_height][(center_x - self.temp_width) // self.temp_width] < 3:
+                if self.board[center_y // self.temp_height][(center_x - self.temp_width) // self.temp_width] < 3:
                     self.avaible_moves[2] = True
-                if self.board.board[center_y // self.temp_height][(center_x + self.temp_width) // self.temp_width] < 3:
+                if self.board[center_y // self.temp_height][(center_x + self.temp_width) // self.temp_width] < 3:
                     self.avaible_moves[0] = True
             if 13 <= center_x % self.temp_width <= 17:
-                if self.board.board[(center_y - self.temp_height) // self.temp_height][center_x // self.temp_width] < 3:
+                if self.board[(center_y - self.temp_height) // self.temp_height][center_x // self.temp_width] < 3:
                     self.avaible_moves[1] = True
-                if self.dead and self.board.board[(center_y + self.temp_height) // self.temp_height][center_x // self.temp_width] == 9:
+                if self.dead and self.board[(center_y + self.temp_height) // self.temp_height][center_x // self.temp_width] == 9:
                     self.avaible_moves[3] = True
-                if self.dead and self.board.board[(center_y + self.padding_walls) // self.temp_height][center_x // self.temp_width] <3:
+                if self.dead and self.board[(center_y + self.padding_walls) // self.temp_height][center_x // self.temp_width] <3:
                     self.avaible_moves[3] = True
                 if not self.dead:
-                    if self.board.board[(center_y + self.temp_height) // self.temp_height][center_x // self.temp_width] < 3:
+                    if self.board[(center_y + self.temp_height) // self.temp_height][center_x // self.temp_width] < 3:
                         self.avaible_moves[3] = True
-                    if self.cooldown and self.board.board[(center_y - self.temp_height) // self.temp_height][center_x // self.temp_width] == 9:
+                    if self.cooldown and self.board[(center_y - self.temp_height) // self.temp_height][center_x // self.temp_width] == 9:
                         self.avaible_moves[1] = True
             if 12 <= center_y % self.temp_height <= 16:
-                if self.board.board[center_y // self.temp_height][(center_x - self.padding_walls) // self.temp_width] < 3:
+                if self.board[center_y // self.temp_height][(center_x - self.padding_walls) // self.temp_width] < 3:
                     self.avaible_moves[2] = True
-                if self.board.board[center_y // self.temp_height][(center_x + self.padding_walls) // self.temp_width] < 3:
+                if self.board[center_y // self.temp_height][(center_x + self.padding_walls) // self.temp_width] < 3:
                     self.avaible_moves[0] = True
         else:
             self.avaible_moves = [True, False, True, False]
@@ -437,8 +432,6 @@ class Ghost():
 
         center_x = self.x + 22
         center_y = self.y + 22
-        temp_2 = (self.board.heigth - 50) // 32
-        temp_1 = self.board.width // 30
         player_pos = (380, 440)
 
         self.get_pacman(player_pos,self.dead_ghost_png)
@@ -447,7 +440,7 @@ class Ghost():
             self.in_box = True
             self.dead = False
 
-        if self.direction ==3 and self.board.board[center_y // temp_2][center_x  // temp_1] == 9:
+        if self.direction ==3 and self.board[center_y // self.temp_height][center_x  // self.temp_width] == 9:
             time_now = datetime.datetime.now()
             self.datetime = time_now.second
 
