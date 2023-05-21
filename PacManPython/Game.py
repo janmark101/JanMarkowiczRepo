@@ -6,7 +6,7 @@ from board import Board
 from ghosts import Ghost
 from board_list import new_board
 from main_screen import Button
-from scoreboard import  scoreboard
+
 
 class Game():
     def __init__(self):
@@ -25,9 +25,18 @@ class Game():
         self.player_lvl_up = False
         self.board_map = new_board
         self.back_menu = False
+        self.Game_on = False
+        self.board = None
+        self.player = None
+        self.Ghost_blue = None
+        self.Ghost_pink = None
+        self.Ghost_red = None
+        self.Ghost_orange = None
         self.Menu()
 
     def Menu(self):
+        clock = pygame.time.Clock ( )
+
         pygame.init()
         self.screen = pygame.display.set_mode ((self.width_menu, self.height_menu))
         pygame.display.set_caption ('Pac-Man')
@@ -36,14 +45,16 @@ class Game():
         button_back = Button (pygame.image.load ("buttons/back_small_button.png"), (80, 665), self.screen)
         button_ok = Button( pygame.image.load( "buttons/button_ok.png" ) , (310 , 550) , self.screen )
         while self.run:
-            if  not self.show_scoreboard:
+
+            if  not self.show_scoreboard and not self.Game_on:
                 for event in pygame.event.get ():
                     if event.type == pygame.QUIT:
                         self.run = False
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         if button_start_game.png_rect.collidepoint (event.pos):
-                            player_end_score = self.Start_game()
-                            self.save_player(button_ok,player_end_score)
+                            self.Game_on = True
+                            self.screen = pygame.display.set_mode ((self.width_game, self.height_game))
+                            self.game_objects()
                         if button_scoreboard.png_rect.collidepoint (event.pos):
                             self.show_scoreboard = True
 
@@ -58,11 +69,194 @@ class Game():
                                 self.show_scoreboard = False
                     self.Show_scoreboard()
                     self.Button_back(button_back)
+                    pygame.display.update ( )
+
+            elif self.Game_on:
+                self.Start_game(button_ok)
+
             else:
                 self.buttons_menu(button_start_game,button_scoreboard)
+                pygame.display.update ( )
+
+            clock.tick (60)
+
+    def game_objects(self):
+        self.board = Board ( self.screen , self.width_game , self.height_game , new_board )
+        self.player = Player ( self.screen , self.board_map , self.Player_lives , self.Player_score , self.width_game ,
+                          self.height_game )
+
+    def Start_game(self,button):
+        self.screen.fill("black")
+
+        if self.player_died:
+            player_lives = self.player.lives
+            player_score = self.player.score
+            self.player = Player(self.screen,self.board_map,player_lives,player_score, self.width_game ,
+                          self.height_game)
+
+            self.Ghost_red = Ghost (self.screen , self.board_map , "red" , 380 , 48 , self.Ghost_speed ,
+                                    self.width_game ,self.height_game)
+            self.Ghost_pink = Ghost (self.screen , self.board_map , "pink" , 52 , 48 , self.Ghost_speed ,
+                                     self.width_game ,self.height_game)
+            self.Ghost_blue = Ghost (self.screen , self.board_map , "blue" , 800 , 48 , self.Ghost_speed ,
+                                     self.width_game ,self.height_game)
+            self.Ghost_orange = Ghost (self.screen , self.board_map , "orange" , 500 , 384 , self.Ghost_speed ,
+                                     self.width_game , self.height_game)
+
+            if self.player_lvl_up:
+                pass #tu bedzie nowa mapa
 
 
-            pygame.display.update()
+
+            for event in pygame.event.get ( ) :
+                if event.type == pygame.QUIT:
+                    pygame.quit ( )
+                    quit ( )
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        self.player_died = False
+                        self.player_lvl_up = False
+
+            self.board.draw_board()
+            self.player.score_lives ( )
+            self.player.show_animation ( )
+            self.Ghost_red.show_ghost()
+            self.Ghost_blue.show_ghost()
+            self.Ghost_pink.show_ghost()
+            self.Ghost_orange.show_ghost()
+            self.Space_to_start()
+            if self.player_lvl_up:
+                self.player.player_level_up()
+                self.Space_to_start()
+
+
+        else:
+            for event in pygame.event.get ( ) :
+                if event.type == pygame.QUIT :
+                    self.run = False
+                if event.type == pygame.KEYDOWN :
+                    if event.key == pygame.K_DOWN :
+                        self.player.set_direction (3)
+                    if event.key == pygame.K_LEFT :
+                        self.player.set_direction (2)
+                    if event.key == pygame.K_UP :
+                        self.player.set_direction (1)
+                    if event.key == pygame.K_RIGHT :
+                        self.player.set_direction (0)
+
+            self.board.draw_board ( )
+            self.player.score_lives()
+            player_pos = self.player.show_animation()
+
+            if self.Ghost_blue.in_box:
+                self.Ghost_blue.ghost_in_box()
+            if self.Ghost_red.in_box:
+                self.Ghost_red.ghost_in_box()
+            if self.Ghost_pink.in_box:
+                self.Ghost_pink.ghost_in_box()
+            if self.Ghost_orange.in_box:
+                self.Ghost_orange.ghost_in_box()
+
+            if self.Ghost_blue.is_pacman_dead(player_pos) and self.player.power_up:
+                self.Ghost_blue.dead = True
+                self.player.full_score +=100
+            if self.Ghost_red.is_pacman_dead(player_pos) and self.player.power_up:
+                self.Ghost_red.dead = True
+                self.player.full_score +=100
+            if self.Ghost_pink.is_pacman_dead(player_pos) and self.player.power_up:
+                self.Ghost_pink.dead = True
+                self.player.full_score +=100
+            if self.Ghost_orange.is_pacman_dead(player_pos) and self.player.power_up:
+                self.Ghost_orange.dead = True
+                self.player.full_score +=100
+
+            if self.player.power_up:
+                if not self.Ghost_blue.dead:
+                    self.Ghost_blue.player_got_power_up()
+                if not self.Ghost_red.dead:
+                    self.Ghost_red.player_got_power_up()
+                if not self.Ghost_pink.dead:
+                    self.Ghost_pink.player_got_power_up()
+                if not self.Ghost_orange.dead:
+                    self.Ghost_orange.player_got_power_up()
+                if self.Ghost_blue.dead:
+                    self.Ghost_blue.ghost_is_dead()
+                if self.Ghost_red.dead:
+                    self.Ghost_red.ghost_is_dead()
+                if self.Ghost_pink.dead:
+                    self.Ghost_pink.ghost_is_dead()
+                if self.Ghost_orange.dead:
+                    self.Ghost_orange.ghost_is_dead()
+
+            else:
+                if self.Ghost_blue.dead:
+                    self.Ghost_blue.ghost_is_dead()
+                if self.Ghost_red.dead:
+                    self.Ghost_red.ghost_is_dead()
+                if self.Ghost_pink.dead:
+                    self.Ghost_pink.ghost_is_dead()
+                if self.Ghost_orange.dead:
+                    self.Ghost_orange.ghost_is_dead()
+
+                if 0 <= self.player.score <= 200 or \
+                        400 <= self.player.score <= 600 or \
+                        800 <= self.player.score <= 1000 or \
+                        1200 <= self.player.score <= 1400 or \
+                        1600 <= self.player.score <= 1800 or \
+                        2000 <= self.player.score <= 2200 or \
+                        2400 <= self.player.score <= 2600 :
+
+                    if self.Ghost_blue.dead or self.Ghost_blue.in_box:
+                        pass
+                    else:
+                        self.Ghost_blue.random_walk_whole_map()
+                    if self.Ghost_red.dead or self.Ghost_red.in_box:
+                        pass
+                    else:
+                        self.Ghost_red.random_walk_border()
+                    if self.Ghost_pink.dead or self.Ghost_pink.in_box:
+                        pass
+                    else:
+                        self.Ghost_pink.random_walk_whole_map()
+                    if self.Ghost_orange.dead or self.Ghost_orange.in_box:
+                        pass
+                    else:
+                        self.Ghost_orange.random_walk_border()
+
+                else:
+                    if self.Ghost_blue.dead or self.Ghost_blue.in_box:
+                        pass
+                    else:
+                        self.Ghost_blue.get_pacman(player_pos,self.Ghost_blue.ghost_png)
+                    if self.Ghost_red.dead or self.Ghost_red.in_box:
+                        pass
+                    else:
+                        self.Ghost_red.get_pacman(player_pos,self.Ghost_red.ghost_png)
+                    if self.Ghost_pink.dead or self.Ghost_pink.in_box:
+                        pass
+                    else:
+                        self.Ghost_pink.get_pacman(player_pos,self.Ghost_pink.ghost_png)
+                    if self.Ghost_orange.dead or self.Ghost_orange.in_box:
+                        pass
+                    else:
+                        self.Ghost_orange.get_pacman(player_pos,self.Ghost_orange.ghost_png)
+
+            if ((self.Ghost_blue.is_pacman_dead(player_pos) and not self.Ghost_blue.dead) or
+                    (self.Ghost_red.is_pacman_dead(player_pos) and not self.Ghost_red.dead) or
+                    (self.Ghost_pink.is_pacman_dead(player_pos) and not self.Ghost_pink.dead) or
+                    (self.Ghost_orange.is_pacman_dead(player_pos) and not self.Ghost_orange.dead)) :
+                self.player.lives -=1
+                self.player_died = True
+
+            if self.player.lives <1:
+                self.screen = pygame.display.set_mode((self.width_menu,self.height_menu))
+                self.save_player(button,self.player.full_score)
+
+            if self.player.score /10 >= 241:
+                self.Ghost_speed +=1
+                self.player_died  = True
+                self.player_lvl_up = True
+        pygame.display.update ( )
 
 
 
@@ -116,178 +310,6 @@ class Game():
         self.screen.blit(pac_man_bg_image, (220, 630))
 
 
-    def Start_game(self):
-        self.screen = pygame.display.set_mode((self.width_game, self.height_game))
-        board = Board (self.screen, self.width_game, self.height_game, new_board)
-        player = Player(self.screen, self.board_map, self.Player_lives, self.Player_score, self.width_game, self.height_game)
-        ghost_blue = Ghost(self.screen, self.board_map, "blue", 800, 48, self.Ghost_speed, self.width_game, self.height_game)
-        ghost_red = Ghost(self.screen,self.board_map,"red",45,48, self.Ghost_speed,self.width_game,self.height_game)
-        ghost_pink = Ghost(self.screen,self.board_map,"pink",52,48, self.Ghost_speed,self.width_game,self.height_game)
-        ghost_orange = Ghost(self.screen,self.board_map,"orange",440,440, self.Ghost_speed,self.width_game,self.height_game)
-        while self.run:
-
-            if self.player_died:
-                player_lives = player.lives
-                player_score = player.full_score
-                player_board = player.board
-
-                player = Player (self.screen,player_board, player_lives, player_score,self.width_game,self.height_game)
-
-                if self.player_lvl_up:
-                    board = Board (self.screen, self.width_game, self.height_game, new_board)
-                    ghost_blue = Ghost( self.screen, self.board_map, "blue", 800, 48, self.Ghost_speed, self.width_game,
-                                        self.height_game )
-                    ghost_red = Ghost( self.screen, self.board_map, "red", 45, 48, self.Ghost_speed, self.width_game,
-                                       self.height_game )
-                    ghost_pink = Ghost( self.screen, self.board_map, "pink", 52, 48, self.Ghost_speed, self.width_game,
-                                        self.height_game )
-                    ghost_orange = Ghost( self.screen, self.board_map, "orange", 440, 440, self.Ghost_speed,
-                                          self.width_game, self.height_game )
-                else:
-                    board = Board( self.screen, self.width_game, self.height_game, new_board )
-                    ghost_blue = Ghost( self.screen, self.board_map, "blue", 800, 48, self.Ghost_speed, self.width_game,
-                                        self.height_game )
-                    ghost_red = Ghost( self.screen, self.board_map, "red", 45, 48, self.Ghost_speed, self.width_game,
-                                       self.height_game )
-                    ghost_pink = Ghost( self.screen, self.board_map, "pink", 52, 48, self.Ghost_speed, self.width_game,
-                                        self.height_game )
-                    ghost_orange = Ghost( self.screen, self.board_map, "orange", 440, 440, self.Ghost_speed,
-                                          self.width_game, self.height_game )
-
-                for event in pygame.event.get( ):
-                    if event.type == pygame.QUIT:
-                        pygame.quit( )
-                        quit( )
-                    elif event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_SPACE:
-                            self.player_died = False
-                            self.player_lvl_up = False
-
-                self.screen.fill("black")
-                board.draw_board ( )
-                player.score_lives ( )
-                player.show_animation ( )
-                ghost_pink.show_ghost ( )
-                ghost_red.show_ghost ( )
-                ghost_blue.show_ghost ( )
-                ghost_orange.show_ghost ( )
-
-                self.Space_to_start()
-
-                if self.player_lvl_up:
-                    player.player_level_up()
-
-                pygame.display.update ( )
-
-            else:
-                self.screen.fill ( "black" )
-                for event in pygame.event.get ( ):
-                    if event.type == pygame.QUIT:
-                        self.run = False
-                    if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_DOWN:
-                            player.set_direction( 3 )
-                        if event.key == pygame.K_LEFT:
-                            player.set_direction( 2 )
-                        if event.key == pygame.K_UP:
-                            player.set_direction( 1 )
-                        if event.key == pygame.K_RIGHT:
-                            player.set_direction( 0 )
-
-                player.score_lives( )
-                board.draw_board( )
-                player_pos = player.show_animation( )
-
-                if ghost_blue.in_box:
-                    ghost_blue.ghost_in_box( )
-                if ghost_red.in_box:
-                    ghost_red.ghost_in_box( )
-                if ghost_pink.in_box:
-                    ghost_pink.ghost_in_box( )
-
-                if ghost_pink.is_pacman_dead( player_pos ) and player.power_up:
-                    ghost_pink.dead = True
-                    player.full_score += 100
-                if ghost_red.is_pacman_dead( player_pos ) and player.power_up:
-                    ghost_red.dead = True
-                    player.full_score += 100
-                if ghost_blue.is_pacman_dead( player_pos ) and player.power_up:
-                    ghost_blue.dead = True
-                    player.full_score += 100
-
-                if player.power_up:
-                    if not ghost_pink.dead:
-                        ghost_pink.player_got_power_up( )
-                    if not ghost_blue.dead:
-                        ghost_blue.player_got_power_up( )
-                    if not ghost_red.dead:
-                        ghost_red.player_got_power_up( )
-                    if ghost_pink.dead:
-                        ghost_pink.ghost_is_dead( )
-                    if ghost_red.dead:
-                        ghost_red.ghost_is_dead( )
-                    if ghost_blue.dead:
-                        ghost_blue.ghost_is_dead( )
-
-                else:
-                    if ghost_pink.dead:
-                        ghost_pink.ghost_is_dead( )
-                    if ghost_red.dead:
-                        ghost_red.ghost_is_dead( )
-                    if ghost_blue.dead:
-                        ghost_blue.ghost_is_dead( )
-
-                    if 0 <= player.score <= 200 or \
-                            400 <= player.score <= 600 or \
-                            800 <= player.score <= 1000 or \
-                            1200 <= player.score <= 1400 or \
-                            1600 <= player.score <= 1800 or \
-                            2000 <= player.score <= 2200 or \
-                            2400 <= player.score <= 2600:
-                        if ghost_pink.dead or ghost_pink.in_box:
-                            pass
-                        else:
-                            ghost_pink.random_walk_whole_map( )
-                        if ghost_blue.dead or ghost_blue.in_box:
-                            pass
-                        else:
-                            ghost_blue.random_walk_border( )
-                        if ghost_red.dead or ghost_red.in_box:
-                            pass
-                        else:
-                            ghost_red.random_walk_whole_map( )
-
-                    else:
-                        if ghost_pink.dead or ghost_pink.in_box:
-                            pass
-                        else:
-                            ghost_pink.get_pacman( player_pos , ghost_pink.ghost_png )
-                        if ghost_blue.dead or ghost_blue.in_box:
-                            pass
-                        else:
-                            ghost_blue.get_pacman( player_pos , ghost_blue.ghost_png )
-                        if ghost_red.dead or ghost_red.in_box:
-                            pass
-                        else:
-                            ghost_red.get_pacman( player_pos , ghost_red.ghost_png )
-
-                if ((ghost_pink.is_pacman_dead( player_pos ) and not ghost_pink.dead) or (
-                        ghost_red.is_pacman_dead( player_pos ) and not ghost_red.dead) or \
-                    (ghost_blue.is_pacman_dead( player_pos ) and not ghost_blue.dead)) and not player.power_up:
-                    player.lives -= 1
-                    self.player_died = True
-
-                if player.lives < 1:
-                    self.screen = pygame.display.set_mode ((self.width_menu, self.height_menu))
-                    return player.full_score
-
-                if player.score / 10 >= 241:
-                    self.Ghost_speed += 1
-                    self.player_died = True
-                    self.player_lvl_up = True
-                pygame.display.update ( )
-
-
 
     def save_player(self,button_ok,player_full_score):
         input_rect = pygame.Rect( 280 , 420 , 220 , 32 )
@@ -319,6 +341,7 @@ class Game():
                         else:
                             pass
                         self.back_menu = True
+                        self.Game_on = False
                         return
                     if input_rect.collidepoint( event.pos ):
                         color = color_active

@@ -6,7 +6,7 @@ from board import Board
 # 0 -prawo,1-goora,2-lewo,3-dol moje
 
 class Player(Board):
-    def __init__(self,screen,board,lives,score,width,height):
+    def __init__(self,screen,board,lives,score_,width,height):
         super().__init__(screen,width,height,board)
         self.player_list = [pygame.transform.scale(pygame.image.load(i), (45, 45)) for i in glob.glob("player_png/*.png")]
         self.counter = 0
@@ -22,7 +22,7 @@ class Player(Board):
         self.kontrolka = None
         self.power_up = False
         self.datetime = None
-        self.full_score = score
+        self.full_score = score_
 
 
     def set_direction(self,direct):
@@ -187,9 +187,5 @@ class Player(Board):
         text_surface = font.render ("LEVEL UP", True, "#ff914d")
         text_rect = text_surface.get_rect ()
         text_rect.topleft = (350, 440)
-        self.screen.blit (text_surface, text_rect)
-        text_surface = font.render ("HIT SPACE TO START", True, "#ff914d")
-        text_rect = text_surface.get_rect ()
-        text_rect.topleft = (220, 500)
         self.screen.blit (text_surface, text_rect)
         pygame.display.update ()
