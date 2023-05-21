@@ -4,12 +4,12 @@ from board import Board
 import datetime
 
 class Ghost(Board):
-    def __init__(self,screen,board,img,x_pos,y_pos,speed,width,height):
+    def __init__(self,screen,board,img_path,x_pos,y_pos,speed,width,height,in_box):
         super().__init__(screen,width,height,board)
-        self.ghost_png = pygame.transform.scale(pygame.image.load(f"ghost_png/{img}.png"), (45, 45))
+        self.ghost_png = pygame.transform.scale(pygame.image.load(img_path), (45, 45))
         self.dead_ghost_png = pygame.transform.scale(pygame.image.load("ghost_png/dead.png"), (45,45))
         self.power_up_ghost = pygame.transform.scale(pygame.image.load("ghost_png/powerup.png"), (45,45))
-        self.in_box = False
+        self.in_box = in_box
         self.x = x_pos
         self.y = y_pos
         self.dead = False

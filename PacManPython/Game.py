@@ -6,6 +6,7 @@ from board import Board
 from ghosts import Ghost
 from board_list import new_board
 from main_screen import Button
+import datetime
 
 
 class Game():
@@ -14,10 +15,10 @@ class Game():
         self.height_menu = 800
         self.width_game = 900
         self.height_game = 950
-        self.Player_lives = 1
+        self.Player_lives = 3
         self.Player_score = 0
         self.User_name = ""
-        self.Ghost_speed = 1
+        self.Ghost_speed = 2
         self.screen = None
         self.run = True
         self.show_scoreboard = False
@@ -32,6 +33,12 @@ class Game():
         self.Ghost_pink = None
         self.Ghost_red = None
         self.Ghost_orange = None
+        self.Ghost_blue_path = Path("ghost_png/blue.png")
+        self.Ghost_red_path = Path ("ghost_png/red.png")
+        self.Ghost_pink_path = Path ("ghost_png/pink.png")
+        self.Ghost_orange_path = Path ("ghost_png/orange.png")
+        self.Scoreboard_path = Path("Scoreboard/Scoreboard.json")
+        self.Logo_path = Path("Logo/pac_man_bg_image.png")
         self.Menu()
 
     def Menu(self):
@@ -90,18 +97,18 @@ class Game():
 
         if self.player_died:
             player_lives = self.player.lives
-            player_score = self.player.score
+            player_score = self.player.full_score
             self.player = Player(self.screen,self.board_map,player_lives,player_score, self.width_game ,
                           self.height_game)
 
-            self.Ghost_red = Ghost (self.screen , self.board_map , "red" , 380 , 48 , self.Ghost_speed ,
-                                    self.width_game ,self.height_game)
-            self.Ghost_pink = Ghost (self.screen , self.board_map , "pink" , 52 , 48 , self.Ghost_speed ,
-                                     self.width_game ,self.height_game)
-            self.Ghost_blue = Ghost (self.screen , self.board_map , "blue" , 800 , 48 , self.Ghost_speed ,
-                                     self.width_game ,self.height_game)
-            self.Ghost_orange = Ghost (self.screen , self.board_map , "orange" , 500 , 384 , self.Ghost_speed ,
-                                     self.width_game , self.height_game)
+            self.Ghost_red = Ghost (self.screen , self.board_map , self.Ghost_red_path, 380 , 48 , self.Ghost_speed ,
+                                    self.width_game ,self.height_game,False)
+            self.Ghost_pink = Ghost (self.screen , self.board_map , self.Ghost_pink_path , 52 , 48 , self.Ghost_speed ,
+                                     self.width_game ,self.height_game,False)
+            self.Ghost_blue = Ghost (self.screen , self.board_map , self.Ghost_blue_path , 800 , 48 , self.Ghost_speed ,
+                                     self.width_game ,self.height_game,False)
+            self.Ghost_orange = Ghost (self.screen , self.board_map , self.Ghost_orange_path , 500 , 384 , self.Ghost_speed ,
+                                     self.width_game , self.height_game,True)
 
             if self.player_lvl_up:
                 pass #tu bedzie nowa mapa
@@ -116,6 +123,8 @@ class Game():
                     if event.key == pygame.K_SPACE:
                         self.player_died = False
                         self.player_lvl_up = False
+                        time_now = datetime.datetime.now ( )
+                        self.Ghost_orange.datetime = time_now.second
 
             self.board.draw_board()
             self.player.score_lives ( )
@@ -131,6 +140,7 @@ class Game():
 
 
         else:
+            print(self.Ghost_orange.datetime)
             for event in pygame.event.get ( ) :
                 if event.type == pygame.QUIT :
                     self.run = False
@@ -241,12 +251,12 @@ class Game():
                     else:
                         self.Ghost_orange.get_pacman(player_pos,self.Ghost_orange.ghost_png)
 
-            if ((self.Ghost_blue.is_pacman_dead(player_pos) and not self.Ghost_blue.dead) or
-                    (self.Ghost_red.is_pacman_dead(player_pos) and not self.Ghost_red.dead) or
-                    (self.Ghost_pink.is_pacman_dead(player_pos) and not self.Ghost_pink.dead) or
-                    (self.Ghost_orange.is_pacman_dead(player_pos) and not self.Ghost_orange.dead)) :
-                self.player.lives -=1
-                self.player_died = True
+                if ((self.Ghost_blue.is_pacman_dead(player_pos) and not self.Ghost_blue.dead) or
+                        (self.Ghost_red.is_pacman_dead(player_pos) and not self.Ghost_red.dead) or
+                        (self.Ghost_pink.is_pacman_dead(player_pos) and not self.Ghost_pink.dead) or
+                        (self.Ghost_orange.is_pacman_dead(player_pos) and not self.Ghost_orange.dead)) :
+                    self.player.lives -=1
+                    self.player_died = True
 
             if self.player.lives <1:
                 self.screen = pygame.display.set_mode((self.width_menu,self.height_menu))
@@ -256,6 +266,7 @@ class Game():
                 self.Ghost_speed +=1
                 self.player_died  = True
                 self.player_lvl_up = True
+
         pygame.display.update ( )
 
 
@@ -273,8 +284,7 @@ class Game():
 
 
     def Show_scoreboard(self,text_x=180,text_y = 45,number=1):
-        path_scoreboard_txt = Path("Scoreboard/Scoreboard.json")
-        with path_scoreboard_txt.open("r") as scoreboard_txt:
+        with self.Scoreboard_path.open("r") as scoreboard_txt:
             content = json.load(scoreboard_txt)
 
         font = pygame.font.Font(None, 45)
@@ -306,7 +316,7 @@ class Game():
 
         button_back.show_button()
 
-        pac_man_bg_image = pygame.transform.scale(pygame.image.load("Logo/pac_man_bg_image.png"), (340, 140))
+        pac_man_bg_image = pygame.transform.scale(pygame.image.load(self.Logo_path), (340, 140))
         self.screen.blit(pac_man_bg_image, (220, 630))
 
 
@@ -316,7 +326,6 @@ class Game():
         color_active = pygame.Color( 'white' )
         color_passive = pygame.Color( '#444444' )
         color = color_passive
-        path_scoreboard_txt = Path( "Scoreboard/Scoreboard.json" )
         while self.run:
             self.screen.fill( "black" )
             (x_mouse , y_mouse) = pygame.mouse.get_pos( )
@@ -329,12 +338,12 @@ class Game():
                         if self.User_name != "":
                             new_player = {"nick": self.User_name , "score": player_full_score}
 
-                            with path_scoreboard_txt.open( "r" ) as input_file:
+                            with self.Scoreboard_path.open( "r" ) as input_file:
                                 data = json.load( input_file )
 
                             data.append( new_player )
 
-                            with path_scoreboard_txt.open( "w" ) as output_file:
+                            with self.Scoreboard_path.open( "w" ) as output_file:
                                 json.dump( data , output_file , indent=4 )
 
                             self.User_name = ""
@@ -381,7 +390,7 @@ class Game():
             text_surface = font.render( self.User_name , True , "black" )
             self.screen.blit( text_surface , (input_rect.x + 5 , input_rect.y + 5) )
 
-            pac_man_bg_image = pygame.transform.scale( pygame.image.load( "Logo/pac_man_bg_image.png" ) , (340 , 140) )
+            pac_man_bg_image = pygame.transform.scale( pygame.image.load( self.Logo_path ) , (340 , 140) )
             self.screen.blit( pac_man_bg_image , (225 , 630) )
 
             button_ok.enlarge_png( x_mouse , y_mouse , "buttons/big_button_ok.png" , 10 , 5 )
