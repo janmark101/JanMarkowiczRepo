@@ -23,6 +23,8 @@ class Ghost(Board):
         self.is_next_direction = False
         self.datetime = None
         self.cooldown = False
+        self.ghost_rect = self.ghost_png.get_rect()
+        self.ghost_rect.center = (x_pos,y_pos)
 
 
     def availableMoves(self):

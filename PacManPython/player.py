@@ -23,6 +23,8 @@ class Player(Board):
         self.power_up = False
         self.datetime = None
         self.full_score = score_
+        self.player_rect = self.player_list[0].get_rect()
+        self.player_rect.center = (430,664)
 
 
     def set_direction(self,direct):

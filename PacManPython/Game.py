@@ -140,7 +140,9 @@ class Game():
 
 
         else:
-            print(self.Ghost_orange.datetime)
+
+            list_of_objects = self.Update_positions()
+
             for event in pygame.event.get ( ) :
                 if event.type == pygame.QUIT :
                     self.run = False
@@ -167,16 +169,16 @@ class Game():
             if self.Ghost_orange.in_box:
                 self.Ghost_orange.ghost_in_box()
 
-            if self.Ghost_blue.is_pacman_dead(player_pos) and self.player.power_up:
+            if list_of_objects[0].colliderect(list_of_objects[1]) and self.player.power_up and not self.Ghost_blue.dead:
                 self.Ghost_blue.dead = True
                 self.player.full_score +=100
-            if self.Ghost_red.is_pacman_dead(player_pos) and self.player.power_up:
+            if list_of_objects[0].colliderect(list_of_objects[2]) and self.player.power_up and not self.Ghost_red.dead:
                 self.Ghost_red.dead = True
                 self.player.full_score +=100
-            if self.Ghost_pink.is_pacman_dead(player_pos) and self.player.power_up:
+            if list_of_objects[0].colliderect(list_of_objects[3]) and self.player.power_up and not self.Ghost_pink.dead:
                 self.Ghost_pink.dead = True
                 self.player.full_score +=100
-            if self.Ghost_orange.is_pacman_dead(player_pos) and self.player.power_up:
+            if list_of_objects[0].colliderect(list_of_objects[4]) and self.player.power_up and not self.Ghost_orange.dead:
                 self.Ghost_orange.dead = True
                 self.player.full_score +=100
 
@@ -251,10 +253,11 @@ class Game():
                     else:
                         self.Ghost_orange.get_pacman(player_pos,self.Ghost_orange.ghost_png)
 
-                if ((self.Ghost_blue.is_pacman_dead(player_pos) and not self.Ghost_blue.dead) or
-                        (self.Ghost_red.is_pacman_dead(player_pos) and not self.Ghost_red.dead) or
-                        (self.Ghost_pink.is_pacman_dead(player_pos) and not self.Ghost_pink.dead) or
-                        (self.Ghost_orange.is_pacman_dead(player_pos) and not self.Ghost_orange.dead)) :
+            if not self.player.power_up:
+                if list_of_objects[0].colliderect(list_of_objects[1]) or\
+                        list_of_objects[0].colliderect(list_of_objects[2]) or\
+                        list_of_objects[0].colliderect(list_of_objects[3]) or \
+                        list_of_objects[0].colliderect(list_of_objects[4]):
                     self.player.lives -=1
                     self.player_died = True
 
@@ -271,6 +274,50 @@ class Game():
 
 
 
+    def Update_positions(self):
+        list = []
+
+        self.player.player_rect.x = self.player.x
+        self.player.player_rect.y = self.player.y
+        player_hit_box = pygame.draw.circle (self.screen , "black" , self.player.player_rect.center ,
+                                                min (self.player.player_rect.width ,
+                                                     self.player.player_rect.height) // 2)
+
+        list.append(player_hit_box)
+
+        self.Ghost_blue.ghost_rect.x = self.Ghost_blue.x
+        self.Ghost_blue.ghost_rect.y = self.Ghost_blue.y
+        ghost_blue_hit_box = pygame.draw.circle (self.screen , "black" , self.Ghost_blue.ghost_rect.center ,
+                                                 min (self.Ghost_blue.ghost_rect.width ,
+                                                      self.Ghost_blue.ghost_rect.height) // 2)
+
+        list.append(ghost_blue_hit_box)
+
+        self.Ghost_red.ghost_rect.x = self.Ghost_red.x
+        self.Ghost_red.ghost_rect.y = self.Ghost_red.y
+        ghost_red_hit_box = pygame.draw.circle (self.screen , "black" , self.Ghost_red.ghost_rect.center ,
+                                                min (self.Ghost_red.ghost_rect.width ,
+                                                     self.Ghost_red.ghost_rect.height) // 2)
+
+        list.append(ghost_red_hit_box)
+
+        self.Ghost_pink.ghost_rect.x = self.Ghost_pink.x
+        self.Ghost_pink.ghost_rect.y = self.Ghost_pink.y
+        ghost_pink_hit_box = pygame.draw.circle (self.screen , "black" , self.Ghost_pink.ghost_rect.center ,
+                                                min (self.Ghost_pink.ghost_rect.width ,
+                                                     self.Ghost_pink.ghost_rect.height) // 2)
+
+        list.append (ghost_pink_hit_box)
+
+        self.Ghost_orange.ghost_rect.x = self.Ghost_orange.x
+        self.Ghost_orange.ghost_rect.y = self.Ghost_orange.y
+        ghost_orange_hit_box = pygame.draw.circle (self.screen , "black" , self.Ghost_orange.ghost_rect.center ,
+                                                min (self.Ghost_orange.ghost_rect.width ,
+                                                     self.Ghost_orange.ghost_rect.height) // 2)
+
+        list.append (ghost_orange_hit_box)
+
+        return list
 
     def buttons_menu(self,button_start_game,button_scoreboard):
         (x_mouse, y_mouse) = pygame.mouse.get_pos()
