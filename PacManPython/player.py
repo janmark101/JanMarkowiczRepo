@@ -3,7 +3,6 @@ import pygame
 import datetime
 from board import Board
 
-# 0 -prawo,1-goora,2-lewo,3-dol moje
 
 class Player(Board):
     def __init__(self,screen,board,lives,score_,width,height):
