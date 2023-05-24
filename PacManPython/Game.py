@@ -19,12 +19,14 @@ class Game():
         self.Player_score = 0
         self.User_name = ""
         self.Ghost_speed = 1
+        self.Level = 1
         self.screen = None
         self.run = True
         self.show_scoreboard = False
         self.player_died = True
         self.player_lvl_up = False
         self.board_map = new_board
+        self.board_copy = [row[:] for row in self.board_map]
         self.back_menu = False
         self.Game_on = False
         self.board = None
@@ -88,14 +90,21 @@ class Game():
             clock.tick (60)
 
     def game_objects(self):
-        self.board = Board ( self.screen , self.width_game , self.height_game , new_board )
+        self.board = Board ( self.screen , self.width_game , self.height_game , self.board_map )
         self.player = Player ( self.screen , self.board_map , self.Player_lives , self.Player_score , self.width_game ,
                           self.height_game )
 
     def Start_game(self,button):
         self.screen.fill("black")
 
+        if self.Level >=4 :
+            self.screen = pygame.display.set_mode((self.width_menu, self.height_menu))
+            self.save_player(button, self.player.full_score, "You win!")
+
         if self.player_died:
+            if self.player_lvl_up:
+                self.reset_map()
+                self.board = Board(self.screen, self.width_game, self.height_game, self.board_map)
             player_lives = self.player.lives
             player_score = self.player.full_score
             self.player = Player(self.screen,self.board_map,player_lives,player_score, self.width_game ,
@@ -109,11 +118,6 @@ class Game():
                                      self.width_game ,self.height_game,False)
             self.Ghost_orange = Ghost (self.screen , self.board_map , self.Ghost_orange_path , 500 , 384 , self.Ghost_speed ,
                                      self.width_game , self.height_game,True)
-
-            if self.player_lvl_up:
-                pass #tu bedzie nowa mapa
-
-
 
             for event in pygame.event.get ( ) :
                 if event.type == pygame.QUIT:
@@ -263,16 +267,18 @@ class Game():
 
             if self.player.lives <1:
                 self.screen = pygame.display.set_mode((self.width_menu,self.height_menu))
-                self.save_player(button,self.player.full_score)
+                self.save_player(button,self.player.full_score,"You died!")
 
             if self.player.score /10 >= 241:
+                self.Level +=1
                 self.Ghost_speed +=1
                 self.player_died  = True
                 self.player_lvl_up = True
 
         pygame.display.update ( )
 
-
+    def reset_map(self):
+        self.board_map = [row[:] for row in self.board_copy]
 
     def Update_positions(self):
         list = []
@@ -368,8 +374,8 @@ class Game():
 
 
 
-    def save_player(self,button_ok,player_full_score):
-        input_rect = pygame.Rect( 280 , 420 , 220 , 32 )
+    def save_player(self,button_ok,player_full_score,win_or_lose):
+        input_rect = pygame.Rect( 280 , 440 , 220 , 32 )
         color_active = pygame.Color( 'white' )
         color_passive = pygame.Color( '#444444' )
         color = color_passive
@@ -414,21 +420,26 @@ class Game():
 
             font = pygame.font.Font( None , 75 )
 
+            text_surface = font.render(win_or_lose, True, '#fcc92e')
+            text_rect = text_surface.get_rect()
+            text_rect.topleft = (265, 70)
+            self.screen.blit(text_surface, text_rect)
+
             text_surface = font.render( "Your score is" , True , '#fcc92e' )
             text_rect = text_surface.get_rect( )
-            text_rect.topleft = (220 , 120)
+            text_rect.topleft = (220 , 140)
             self.screen.blit( text_surface , text_rect )
 
             text_surface = font.render( f"{player_full_score}" , True , '#fcc92e' )
             text_rect = text_surface.get_rect( )
-            text_rect.topleft = (340 , 230)
+            text_rect.topleft = (330 , 245)
             self.screen.blit( text_surface , text_rect )
 
             font = pygame.font.Font( None , 55 )
 
             text_surface = font.render( "Write your name " , True , '#fcc92e' )
             text_rect = text_surface.get_rect( )
-            text_rect.topleft = (235 , 330)
+            text_rect.topleft = (235 , 340)
             self.screen.blit( text_surface , text_rect )
 
             font = pygame.font.Font( None , 35 )
@@ -438,7 +449,7 @@ class Game():
             self.screen.blit( text_surface , (input_rect.x + 5 , input_rect.y + 5) )
 
             pac_man_bg_image = pygame.transform.scale( pygame.image.load( self.Logo_path ) , (340 , 140) )
-            self.screen.blit( pac_man_bg_image , (225 , 630) )
+            self.screen.blit( pac_man_bg_image , (225 , 640) )
 
             button_ok.enlarge_png( x_mouse , y_mouse , "buttons/big_button_ok.png" , 10 , 5 )
             button_ok.show_button( )
@@ -451,3 +462,4 @@ class Game():
         text_rect = text_surface.get_rect ( )
         text_rect.topleft = (220, 500)
         self.screen.blit ( text_surface, text_rect )
+

@@ -7,7 +7,7 @@ Game()
 
 
 
-#mape ogaranac
+#powrot duchow
 #i pograc poszukac bledow
 
 

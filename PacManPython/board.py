@@ -9,7 +9,10 @@ class Board():
         self.temp_width = self.width //30
         self.temp_height = (self.heigth-50) //32
         self.board = board
+        self.board_copy = [row[:] for row in self.board]
 
+    def reset_map(self):
+        self.board = [row[:] for row in self.board_copy]
 
     def draw_board(self):
         color_lines = "blue"
