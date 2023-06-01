@@ -449,13 +449,13 @@ class Ghost(Board):
                                                  min (self.ghost_rect.width ,
                                                       self.ghost_rect.height) // 2 , 1)
 
-        box = [ 435 , 434]  # 450 400
-        box_place = pygame.draw.circle (self.screen , "green" , (box[ 0 ] , box[ 1 ]) , 10)
-        self.ghost_dead_walk (box )
+        box = [ 435 , 434]
+        box_place = pygame.draw.circle (self.screen , "black" , (box[ 0 ] , box[ 1 ]) , 10)
+        self.ghost_dead_walk (box)
 
         if (350 <= self.x <= 520) and (380 <= self.y <= 450):
             image = self.ghost_png
-            self.dead_speed = 2
+            self.dead_speed = 1
         else:
             image = self.dead_ghost_png
 
@@ -478,15 +478,16 @@ class Ghost(Board):
             self.random_walk_border()
 
         time_now = datetime.datetime.now()
+        time_now_second = time_now.second
 
         if time_now.second <= 5:
-            if self.datetime + 5 == time_now.second + 60:
+            if self.datetime + 5 <= time_now_second + 60:
                 self.cooldown = True
 
         else:
-            if self.datetime + 5 == time_now.second:
+            if self.datetime + 5 <= time_now_second:
                 self.cooldown = True
 
-        if ((self.x <= 350 or self.x >= 500) and (self.y <= 390 or self.y >= 425)) and self.cooldown:
+        if not (350 <= self.x <= 560) and not (370 <= self.y <= 500) and self.cooldown:
             self.in_box = False
             self.cooldown = False
