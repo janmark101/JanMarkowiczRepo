@@ -18,7 +18,7 @@ class Game():
         self.Player_lives = 3
         self.Player_score = 0
         self.User_name = ""
-        self.Ghost_speed = 1
+        self.Ghost_speed = 2
         self.Level = 1
         self.screen = None
         self.run = True

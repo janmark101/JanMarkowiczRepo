@@ -25,6 +25,7 @@ class Ghost(Board):
         self.cooldown = False
         self.ghost_rect = self.ghost_png.get_rect()
         self.ghost_rect.center = (x_pos,y_pos)
+        self.dead_speed = 1
 
 
     def availableMoves(self):
@@ -101,20 +102,17 @@ class Ghost(Board):
                 self.next_direction = random.choice(self.list_of_directions)
                 self.is_next_direction = True
 
-
             elif self.random_direction == 2 and len(self.list_of_directions) >=3 and not self.is_next_direction:
                 if 0 in self.list_of_directions:
                     self.list_of_directions.remove(0)
                 self.next_direction = random.choice(self.list_of_directions)
                 self.is_next_direction = True
 
-
             elif self.random_direction == 1 and len(self.list_of_directions) >=3 and not self.is_next_direction:
                 if 3 in self.list_of_directions:
                     self.list_of_directions.remove(3)
                 self.next_direction = random.choice(self.list_of_directions)
                 self.is_next_direction = True
-
 
             elif self.random_direction == 3 and len(self.list_of_directions) >=3 and not self.is_next_direction:
                 if 1 in self.list_of_directions:
@@ -166,7 +164,6 @@ class Ghost(Board):
 
 
         self.screen.blit(self.ghost_png, (self.x, self.y))
-        pygame.display.update()
         self.move_ghost()
 
 
@@ -174,42 +171,44 @@ class Ghost(Board):
 
         self.availableMoves()
 
+        if len (self.list_of_directions) == 0 :
+            pass
+        else :
 
-        if self.random_direction == 2 :
-            if self.avaible_moves[2]:
-                self.random_direction = 2
-            else:
-                if 0 in self.list_of_directions:
-                    self.list_of_directions.remove(0)
+            if self.random_direction == 2 :
+                if self.avaible_moves[2]:
+                    self.random_direction = 2
+                else:
+                    if 0 in self.list_of_directions:
+                        self.list_of_directions.remove(0)
+                    self.random_direction = random.choice(self.list_of_directions)
+
+            elif self.random_direction == 0 :
+                if self.avaible_moves[0]:
+                    self.random_direction = 0
+                else:
+                    if 2 in self.list_of_directions:
+                        self.list_of_directions.remove(2)
+                    self.random_direction = random.choice(self.list_of_directions)
+
+            elif self.random_direction == 1 :
+                if self.avaible_moves[1]:
+                    self.random_direction = 1
+                else:
+                    if 3 in self.list_of_directions:
+                        self.list_of_directions.remove(3)
+                    self.random_direction = random.choice(self.list_of_directions)
+
+            elif self.random_direction == 3 :
+                if self.avaible_moves[3]:
+                    self.random_direction = 3
+                else:
+                    if 1 in self.list_of_directions:
+                        self.list_of_directions.remove(1)
+                    self.random_direction = random.choice(self.list_of_directions)
+
+            if not self.avaible_moves[self.random_direction] :
                 self.random_direction = random.choice(self.list_of_directions)
-
-
-        elif self.random_direction == 0 :
-            if self.avaible_moves[0]:
-                self.random_direction = 0
-            else:
-                if 2 in self.list_of_directions:
-                    self.list_of_directions.remove(2)
-                self.random_direction = random.choice(self.list_of_directions)
-
-        elif self.random_direction == 1 :
-            if self.avaible_moves[1]:
-                self.random_direction = 1
-            else:
-                if 3 in self.list_of_directions:
-                    self.list_of_directions.remove(3)
-                self.random_direction = random.choice(self.list_of_directions)
-
-        elif self.random_direction == 3 :
-            if self.avaible_moves[3]:
-                self.random_direction = 3
-            else:
-                if 1 in self.list_of_directions:
-                    self.list_of_directions.remove(1)
-                self.random_direction = random.choice(self.list_of_directions)
-
-        if not self.avaible_moves[self.random_direction] :
-            self.random_direction = random.choice(self.list_of_directions)
 
 
         self.move_ghost()
@@ -227,7 +226,7 @@ class Ghost(Board):
                 self.y += self.speed
 
         self.screen.blit(self.ghost_png, (self.x, self.y))
-        pygame.display.update()
+
 
 
     def get_pacman(self,player_pos,image):
@@ -366,7 +365,7 @@ class Ghost(Board):
                     self.y += self.speed
         
         self.screen.blit(image, (self.x, self.y))
-        pygame.display.update()
+
 
     def player_got_power_up(self):
 
@@ -379,8 +378,6 @@ class Ghost(Board):
                 if 0 in self.list_of_directions:
                     self.list_of_directions.remove(0)
                 self.random_direction = random.choice(self.list_of_directions)
-
-
         elif self.random_direction == 0:
             if self.avaible_moves[0]:
                 self.random_direction = 0
@@ -388,7 +385,6 @@ class Ghost(Board):
                 if 2 in self.list_of_directions:
                     self.list_of_directions.remove(2)
                 self.random_direction = random.choice(self.list_of_directions)
-
         elif self.random_direction == 1:
             if self.avaible_moves[1]:
                 self.random_direction = 1
@@ -396,7 +392,6 @@ class Ghost(Board):
                 if 3 in self.list_of_directions:
                     self.list_of_directions.remove(3)
                 self.random_direction = random.choice(self.list_of_directions)
-
         elif self.random_direction == 3:
             if self.avaible_moves[3]:
                 self.random_direction = 3
@@ -418,37 +413,62 @@ class Ghost(Board):
                 self.y += 1
 
         self.screen.blit(self.power_up_ghost, (self.x, self.y))
-        pygame.display.update()
+
+
 
     def show_ghost(self):
         self.screen.blit(self.ghost_png, (self.x, self.y))
-        pygame.display.update()
 
-    def is_pacman_dead(self,player_pos):
-        if self.x in range(player_pos[0]-4 ,player_pos[0]+4) and self.y in range(player_pos[1]-4 ,player_pos[1]+4):
-            return True
-        else:
-            return False
+
+
+    def ghost_dead_walk(self , box ) :
+        self.availableMoves ( )
+
+        if self.x < box[0]:
+            self.x += self.dead_speed
+            if self.y < box[1]:
+                self.y += self.dead_speed
+            if self.y > box[1]:
+                self.y -= self.dead_speed
+        if self.x > box[0]:
+            self.x -= self.dead_speed
+            if self.y < box[1]:
+                self.y += self.dead_speed
+            if self.y > box[1]:
+                self.y -= self.dead_speed
+        if self.x == box[0]:
+            if self.y < box[1]:
+                self.y += self.dead_speed
+            if self.y > box[1]:
+                self.y -= self.dead_speed
 
     def ghost_is_dead(self):
+        self.ghost_rect.x = self.x
+        self.ghost_rect.y = self.y
+        ghost_blue_hit_box = pygame.draw.circle (self.screen , "black" , self.ghost_rect.center ,
+                                                 min (self.ghost_rect.width ,
+                                                      self.ghost_rect.height) // 2 , 1)
 
-        center_x = self.x + 22
-        center_y = self.y + 22
-        player_pos = (380, 440)
+        box = [ 435 , 434]  # 450 400
+        box_place = pygame.draw.circle (self.screen , "green" , (box[ 0 ] , box[ 1 ]) , 10)
+        self.ghost_dead_walk (box )
 
-        self.get_pacman(player_pos,self.dead_ghost_png)
+        if (350 <= self.x <= 520) and (380 <= self.y <= 450):
+            image = self.ghost_png
+            self.dead_speed = 2
+        else:
+            image = self.dead_ghost_png
 
-        if 350 <= self.x <= 500 and 390 <= self.y <= 425:
+        if ghost_blue_hit_box.colliderect (box_place):
             self.in_box = True
+            time_now = datetime.datetime.now ( )
+            self.datetime = time_now.second
+            image = self.ghost_png
             self.dead = False
 
-        if self.direction ==3 and self.board[center_y // self.temp_height][center_x  // self.temp_width] == 9:
-            time_now = datetime.datetime.now()
-            self.datetime = time_now.second
+        self.screen.blit (image , (self.x , self.y))
 
 
-        self.screen.blit(self.dead_ghost_png, (self.x, self.y))
-        pygame.display.update()
 
     def ghost_in_box(self):
 
