@@ -25,6 +25,7 @@ class Player(Board):
         self.player_rect = self.player_list[0].get_rect()
         self.player_rect.center = (430,664)
         self.player_speed = 2
+        self.eaten_points = 0
 
 
     def set_direction(self,direct):
@@ -101,7 +102,7 @@ class Player(Board):
 
 
         self.screen.blit(pygame.transform.rotate(self.player_list[int(self.counter)], self.angle), (self.x,self.y))
-        pygame.display.update()
+        #pygame.display.update()
 
         self.counter +=0.2
         return (self.x, self.y)
@@ -148,6 +149,7 @@ class Player(Board):
         if self.board[center_y //  self.temp_height][center_x  // self.temp_width] == 1:
             self.board[center_y //  self.temp_height][center_x  // self.temp_width] = 0
             self.score+=10
+            self.eaten_points +=1
             self.full_score +=10
         elif self.board[center_y //  self.temp_height][center_x  // self.temp_width] == 2:
             self.board[center_y //  self.temp_height][center_x  // self.temp_width] = 0
@@ -190,4 +192,4 @@ class Player(Board):
         text_rect = text_surface.get_rect ()
         text_rect.topleft = (350, 440)
         self.screen.blit (text_surface, text_rect)
-        pygame.display.update ()
+

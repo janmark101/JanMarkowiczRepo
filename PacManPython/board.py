@@ -10,7 +10,7 @@ class Board():
         self.temp_height = (self.heigth-50) //32
         self.board = board
         self.board_copy = [row[:] for row in self.board]
-
+        self.count_points = 0
     def reset_map(self):
         self.board = [row[:] for row in self.board_copy]
 
@@ -40,4 +40,10 @@ class Board():
                     pygame.draw.line(self.screen, color_coins,(self.temp_width*j,self.temp_height*i+(0.5*self.temp_height)),(self.temp_width*(j+1),self.temp_height*i+(0.5*self.temp_height)),width=3)
 
 
+    def count_points_funt(self):
+        for i in range(len(self.board)):
+            for j in range(len(self.board[i])):
+                if self.board[i][j] == 1:
+                    self.count_points +=1
 
+        print(self.count_points)

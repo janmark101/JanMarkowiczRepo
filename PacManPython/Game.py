@@ -18,7 +18,7 @@ class Game():
         self.Player_lives = 3
         self.Player_score = 0
         self.User_name = ""
-        self.Ghost_speed = 3
+        self.Ghost_speed = 1
         self.Level = 1
         self.screen = None
         self.run = True
@@ -125,6 +125,7 @@ class Game():
         self.board = Board ( self.screen , self.width_game , self.height_game , self.board_map )
         self.player = Player ( self.screen , self.board_map , self.Player_lives , self.Player_score , self.width_game ,
                           self.height_game )
+        self.board.count_points_funt()
 
 
     def choose_map(self,button_map_1,button_map_2):
@@ -157,8 +158,10 @@ class Game():
 
         if self.player_died:
             if self.player_lvl_up:
+                self.player.eaten_points = 0
                 self.reset_map()
                 self.board = Board(self.screen, self.width_game, self.height_game, self.board_map)
+                self.board.count_points_funt()
             player_lives = self.player.lives
             player_score = self.player.full_score
             self.player = Player(self.screen,self.board_map,player_lives,player_score, self.width_game ,
@@ -312,31 +315,37 @@ class Game():
                         self.Ghost_orange.get_pacman(player_pos,self.Ghost_orange.ghost_png)
 
             if not self.player.power_up:
-                pass
-                # if list_of_objects[0].colliderect(list_of_objects[1]) or\
-                #         list_of_objects[0].colliderect(list_of_objects[2]) or\
-                #         list_of_objects[0].colliderect(list_of_objects[3]) or \
-                #         list_of_objects[0].colliderect(list_of_objects[4]):
-                #     self.player.lives -=1
-                #     self.player_died = True
+                if list_of_objects[0].colliderect(list_of_objects[1]) or\
+                        list_of_objects[0].colliderect(list_of_objects[2]) or\
+                        list_of_objects[0].colliderect(list_of_objects[3]) or \
+                        list_of_objects[0].colliderect(list_of_objects[4]):
+                    self.player.lives -=1
+                    self.player_died = True
 
             if self.player.lives <1:
                 self.screen = pygame.display.set_mode((self.width_menu,self.height_menu))
                 self.save_player(button,self.player.full_score,"You died!")
+            print(self.player.eaten_points)
 
-            if self.which_board == 1:
-                if self.player.score / 10 >= 241:
-                    self.Level += 1
-                    self.Ghost_speed += 1
-                    self.player_died = True
-                    self.player_lvl_up = True
+            if self.player.eaten_points >= self.board.count_points:
+                self.Level += 1
+                self.Ghost_speed += 1
+                self.player_died = True
+                self.player_lvl_up = True
 
-            if self.which_board == 2:
-                if self.player.score / 10 >= 265:
-                    self.Level += 1
-                    self.Ghost_speed += 1
-                    self.player_died = True
-                    self.player_lvl_up = True
+            # if self.which_board == 1:
+            #     # if self.player.score / 10 >= 241:
+            #     #     self.Level += 1
+            #     #     self.Ghost_speed += 1
+            #     #     self.player_died = True
+            #     #     self.player_lvl_up = True
+            #
+            # if self.which_board == 2:
+            #     if self.player.score / 10 >= 265:
+            #         self.Level += 1
+            #         self.Ghost_speed += 1
+            #         self.player_died = True
+            #         self.player_lvl_up = True
 
 
         pygame.display.update ( )

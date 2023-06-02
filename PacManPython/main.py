@@ -7,7 +7,7 @@ Game()
 
 
 
-#zmienic punkty odpowiedzialne za lvl up na nowej mapie
+#lvl up
 
 
 
