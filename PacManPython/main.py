@@ -7,8 +7,7 @@ Game()
 
 
 
-#powrot duchow
-#i pograc poszukac bledow
+#check for error
 
 
 

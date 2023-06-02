@@ -7,7 +7,7 @@ from ghosts import Ghost
 from board_list import new_board
 from main_screen import Button
 import datetime
-
+import re
 
 class Game():
     def __init__(self):
@@ -41,6 +41,8 @@ class Game():
         self.Ghost_orange_path = Path ("ghost_png/orange.png")
         self.Scoreboard_path = Path("Scoreboard/Scoreboard.json")
         self.Logo_path = Path("Logo/pac_man_bg_image.png")
+        self.pattern_length = r"^.{4,12}$"
+        self.special_chars_pattern = r"[^\w]+"
         self.Menu()
 
     def Menu(self):
@@ -287,7 +289,7 @@ class Game():
         self.player.player_rect.y = self.player.y
         player_hit_box = pygame.draw.circle (self.screen , "black" , self.player.player_rect.center ,
                                                 min (self.player.player_rect.width ,
-                                                     self.player.player_rect.height) // 2)
+                                                     self.player.player_rect.height) // 3)
 
         list.append(player_hit_box)
 
@@ -295,7 +297,7 @@ class Game():
         self.Ghost_blue.ghost_rect.y = self.Ghost_blue.y
         ghost_blue_hit_box = pygame.draw.circle (self.screen , "black" , self.Ghost_blue.ghost_rect.center ,
                                                  min (self.Ghost_blue.ghost_rect.width ,
-                                                      self.Ghost_blue.ghost_rect.height) // 2)
+                                                      self.Ghost_blue.ghost_rect.height) // 3)
 
         list.append(ghost_blue_hit_box)
 
@@ -303,7 +305,7 @@ class Game():
         self.Ghost_red.ghost_rect.y = self.Ghost_red.y
         ghost_red_hit_box = pygame.draw.circle (self.screen , "black" , self.Ghost_red.ghost_rect.center ,
                                                 min (self.Ghost_red.ghost_rect.width ,
-                                                     self.Ghost_red.ghost_rect.height) // 2)
+                                                     self.Ghost_red.ghost_rect.height) // 3)
 
         list.append(ghost_red_hit_box)
 
@@ -311,7 +313,7 @@ class Game():
         self.Ghost_pink.ghost_rect.y = self.Ghost_pink.y
         ghost_pink_hit_box = pygame.draw.circle (self.screen , "black" , self.Ghost_pink.ghost_rect.center ,
                                                 min (self.Ghost_pink.ghost_rect.width ,
-                                                     self.Ghost_pink.ghost_rect.height) // 2)
+                                                     self.Ghost_pink.ghost_rect.height) // 3)
 
         list.append (ghost_pink_hit_box)
 
@@ -319,7 +321,7 @@ class Game():
         self.Ghost_orange.ghost_rect.y = self.Ghost_orange.y
         ghost_orange_hit_box = pygame.draw.circle (self.screen , "black" , self.Ghost_orange.ghost_rect.center ,
                                                 min (self.Ghost_orange.ghost_rect.width ,
-                                                     self.Ghost_orange.ghost_rect.height) // 2)
+                                                     self.Ghost_orange.ghost_rect.height) // 3)
 
         list.append (ghost_orange_hit_box)
 
@@ -379,6 +381,8 @@ class Game():
         color_active = pygame.Color( 'white' )
         color_passive = pygame.Color( '#444444' )
         color = color_passive
+        good_length = False
+        no_special_chars = False
         while self.run:
             self.screen.fill( "black" )
             (x_mouse , y_mouse) = pygame.mouse.get_pos( )
@@ -389,22 +393,39 @@ class Game():
                     if button_ok.png_rect.collidepoint( event.pos ):
 
                         if self.User_name != "":
-                            new_player = {"nick": self.User_name , "score": player_full_score}
 
-                            with self.Scoreboard_path.open( "r" ) as input_file:
-                                data = json.load( input_file )
+                            if re.match (self.pattern_length , self.User_name):
+                                if not re.search (self.special_chars_pattern , self.User_name):
+                                    new_player = {"nick": self.User_name , "score": player_full_score}
+                                    with self.Scoreboard_path.open ("r") as input_file:
+                                        data = json.load (input_file)
 
-                            data.append( new_player )
+                                    data.append (new_player)
 
-                            with self.Scoreboard_path.open( "w" ) as output_file:
-                                json.dump( data , output_file , indent=4 )
+                                    with self.Scoreboard_path.open ("w") as output_file:
+                                        json.dump (data , output_file , indent=4)
 
-                            self.User_name = ""
+                                    self.back_menu = True
+                                    self.Game_on = False
+                                    self.User_name = ""
+                                    good_length = False
+                                    no_special_chars = False
+                                    return
+
+                                else:
+                                    good_length = False
+                                    no_special_chars = True
+                            else:
+                                good_length = True
+
+
                         else:
-                            pass
-                        self.back_menu = True
-                        self.Game_on = False
-                        return
+                            self.back_menu = True
+                            self.Game_on = False
+                            return
+
+
+
                     if input_rect.collidepoint( event.pos ):
                         color = color_active
                     else:
@@ -417,6 +438,23 @@ class Game():
                         pass
                     else:
                         self.User_name += event.unicode
+
+            if no_special_chars:
+                font = pygame.font.Font (None , 25)
+
+                text_surface = font.render ("No special characters!" , True , '#fcc92e')
+                text_rect = text_surface.get_rect ( )
+                text_rect.topleft = (300 , 480)
+                self.screen.blit (text_surface , text_rect)
+
+            if good_length:
+                font = pygame.font.Font (None , 25)
+
+                text_surface = font.render ("Name must contain from 4 to 12 characters! " , True , '#fcc92e')
+                text_rect = text_surface.get_rect ( )
+                text_rect.topleft = (210 , 480)
+                self.screen.blit (text_surface , text_rect)
+
 
             font = pygame.font.Font( None , 75 )
 
