@@ -24,6 +24,7 @@ class Player(Board):
         self.full_score = score_
         self.player_rect = self.player_list[0].get_rect()
         self.player_rect.center = (430,664)
+        self.player_speed = 2
 
 
     def set_direction(self,direct):
@@ -78,16 +79,16 @@ class Player(Board):
             self.kontrolka = None
 
         elif self.direction == 0 and self.can_move[0]:
-            self.x += 2
+            self.x += self.player_speed
             self.angle = 0
         elif self.direction == 2 and self.can_move[2]:
-            self.x -= 2
+            self.x -= self.player_speed
             self.angle = 180
         elif self.direction == 1 and self.can_move[1]:
-            self.y -= 2
+            self.y -= self.player_speed
             self.angle = 90
         elif self.direction == 3 and self.can_move[3]:
-            self.y += 2
+            self.y += self.player_speed
             self.angle = 270
 
     def show_animation(self):

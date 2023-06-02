@@ -18,16 +18,16 @@ class Game():
         self.Player_lives = 3
         self.Player_score = 0
         self.User_name = ""
-        self.Ghost_speed = 2
+        self.Ghost_speed = 3
         self.Level = 1
         self.screen = None
         self.run = True
         self.show_scoreboard = False
         self.player_died = True
         self.player_lvl_up = False
-        self.board_map = new_board
-        self.board_map_2 = new_board_2
-        self.board_copy = [row[:] for row in self.board_map]
+        self.board_map = None
+        self.which_board = None
+        self.board_copy = None
         self.back_menu = False
         self.Game_on = False
         self.board = None
@@ -95,14 +95,18 @@ class Game():
                             if button_ok_map_1.png_rect.collidepoint(event.pos):
                                 self.map_choosen = False
                                 self.board_map = new_board
-                                self.Game_on = True
                                 self.screen = pygame.display.set_mode ((self.width_game , self.height_game))
+                                self.which_board = 1
+                                self.board_copy =  [row[ : ] for row in self.board_map ]
+                                self.Game_on = True
                                 self.game_objects()
                             if button_ok_map_2.png_rect.collidepoint(event.pos):
                                 self.map_choosen = False
                                 self.board_map = new_board_2
-                                self.Game_on = True
                                 self.screen = pygame.display.set_mode ((self.width_game , self.height_game))
+                                self.which_board = 2
+                                self.board_copy = [ row[ : ] for row in self.board_map ]
+                                self.Game_on = True
                                 self.game_objects ( )
 
                     self.choose_map(button_ok_map_1,button_ok_map_2)
@@ -308,22 +312,32 @@ class Game():
                         self.Ghost_orange.get_pacman(player_pos,self.Ghost_orange.ghost_png)
 
             if not self.player.power_up:
-                if list_of_objects[0].colliderect(list_of_objects[1]) or\
-                        list_of_objects[0].colliderect(list_of_objects[2]) or\
-                        list_of_objects[0].colliderect(list_of_objects[3]) or \
-                        list_of_objects[0].colliderect(list_of_objects[4]):
-                    self.player.lives -=1
-                    self.player_died = True
+                pass
+                # if list_of_objects[0].colliderect(list_of_objects[1]) or\
+                #         list_of_objects[0].colliderect(list_of_objects[2]) or\
+                #         list_of_objects[0].colliderect(list_of_objects[3]) or \
+                #         list_of_objects[0].colliderect(list_of_objects[4]):
+                #     self.player.lives -=1
+                #     self.player_died = True
 
             if self.player.lives <1:
                 self.screen = pygame.display.set_mode((self.width_menu,self.height_menu))
                 self.save_player(button,self.player.full_score,"You died!")
 
-            if self.player.score /10 >= 241:
-                self.Level +=1
-                self.Ghost_speed +=1
-                self.player_died  = True
-                self.player_lvl_up = True
+            if self.which_board == 1:
+                if self.player.score / 10 >= 241:
+                    self.Level += 1
+                    self.Ghost_speed += 1
+                    self.player_died = True
+                    self.player_lvl_up = True
+
+            if self.which_board == 2:
+                if self.player.score / 10 >= 265:
+                    self.Level += 1
+                    self.Ghost_speed += 1
+                    self.player_died = True
+                    self.player_lvl_up = True
+
 
         pygame.display.update ( )
 
