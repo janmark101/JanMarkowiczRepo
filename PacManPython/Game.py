@@ -4,7 +4,7 @@ import pygame
 from player import Player
 from board import Board
 from ghosts import Ghost
-from board_list import new_board
+from board_list import new_board,new_board_2
 from main_screen import Button
 import datetime
 import re
@@ -26,6 +26,7 @@ class Game():
         self.player_died = True
         self.player_lvl_up = False
         self.board_map = new_board
+        self.board_map_2 = new_board_2
         self.board_copy = [row[:] for row in self.board_map]
         self.back_menu = False
         self.Game_on = False
@@ -43,6 +44,7 @@ class Game():
         self.Logo_path = Path("Logo/pac_man_bg_image.png")
         self.pattern_length = r"^.{4,12}$"
         self.special_chars_pattern = r"[^\w]+"
+        self.map_choosen = False
         self.Menu()
 
     def Menu(self):
@@ -55,17 +57,18 @@ class Game():
         button_scoreboard = Button (pygame.image.load ("buttons/Button_scoreboard.png"), (240, 460), self.screen)
         button_back = Button (pygame.image.load ("buttons/back_small_button.png"), (80, 665), self.screen)
         button_ok = Button( pygame.image.load( "buttons/button_ok.png" ) , (310 , 550) , self.screen )
+        button_ok_map_1 = Button (pygame.image.load ("buttons/button_ok.png") , (125 , 600) , self.screen)
+        button_ok_map_2 = Button (pygame.image.load ("buttons/button_ok.png") , (500 , 600) , self.screen)
         while self.run:
 
-            if  not self.show_scoreboard and not self.Game_on:
+            if  not self.show_scoreboard and not self.Game_on and not self.map_choosen:
                 for event in pygame.event.get ():
                     if event.type == pygame.QUIT:
                         self.run = False
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         if button_start_game.png_rect.collidepoint (event.pos):
-                            self.Game_on = True
-                            self.screen = pygame.display.set_mode ((self.width_game, self.height_game))
-                            self.game_objects()
+                            self.map_choosen = True
+                            self.screen = pygame.display.set_mode ((self.width_menu , self.height_menu))
                         if button_scoreboard.png_rect.collidepoint (event.pos):
                             self.show_scoreboard = True
 
@@ -82,6 +85,29 @@ class Game():
                     self.Button_back(button_back)
                     pygame.display.update ( )
 
+            elif self.map_choosen:
+                self.screen.fill ("black")
+                if self.map_choosen:
+                    for event in pygame.event.get ( ):
+                        if event.type == pygame.QUIT:
+                            self.run = False
+                        if event.type == pygame.MOUSEBUTTONDOWN:
+                            if button_ok_map_1.png_rect.collidepoint(event.pos):
+                                self.map_choosen = False
+                                self.board_map = new_board
+                                self.Game_on = True
+                                self.screen = pygame.display.set_mode ((self.width_game , self.height_game))
+                                self.game_objects()
+                            if button_ok_map_2.png_rect.collidepoint(event.pos):
+                                self.map_choosen = False
+                                self.board_map = new_board_2
+                                self.Game_on = True
+                                self.screen = pygame.display.set_mode ((self.width_game , self.height_game))
+                                self.game_objects ( )
+
+                    self.choose_map(button_ok_map_1,button_ok_map_2)
+                    pygame.display.update ( )
+
             elif self.Game_on:
                 self.Start_game(button_ok)
 
@@ -95,6 +121,28 @@ class Game():
         self.board = Board ( self.screen , self.width_game , self.height_game , self.board_map )
         self.player = Player ( self.screen , self.board_map , self.Player_lives , self.Player_score , self.width_game ,
                           self.height_game )
+
+
+    def choose_map(self,button_map_1,button_map_2):
+        font = pygame.font.Font (None , 75)
+
+        text_surface = font.render ("CHOOSE YOUR MAP" , True , '#fcc92e')
+        text_rect = text_surface.get_rect ( )
+        text_rect.topleft = (140 , 70)
+        self.screen.blit (text_surface , text_rect)
+
+        Map_1 = pygame.transform.scale(pygame.image.load("Maps/map_1.png"), (360,310))
+        Map_2 = pygame.transform.scale(pygame.image.load("Maps/map_2.png"), (360,310))
+        (x_mouse , y_mouse) = pygame.mouse.get_pos ( )
+        button_map_1.enlarge_png (x_mouse , y_mouse , "buttons/big_button_ok.png" , 10 , 5)
+
+        button_map_1.show_button ( )
+
+        button_map_2.enlarge_png (x_mouse , y_mouse , "buttons/big_button_ok.png" , 10 , 5)
+
+        button_map_2.show_button ( )
+        self.screen.blit (Map_1 , (20 , 250))
+        self.screen.blit (Map_2 , (400 , 250))
 
     def Start_game(self,button):
         self.screen.fill("black")
@@ -418,13 +466,10 @@ class Game():
                             else:
                                 good_length = True
 
-
                         else:
                             self.back_menu = True
                             self.Game_on = False
                             return
-
-
 
                     if input_rect.collidepoint( event.pos ):
                         color = color_active
