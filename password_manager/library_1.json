@@ -1,0 +1,22 @@
+[
+    {
+        "website": "Youtube",
+        "email": "jmark@gmail.com",
+        "password": "pizza"
+    },
+    {
+        "website": "Twitter",
+        "email": "jmark001@gmail.com",
+        "password": "hotdog"
+    },
+    {
+        "website": "Facebook",
+        "email": "markjan@gmail",
+        "password": "hamburger22"
+    },
+    {
+        "website": "Netflix",
+        "email": "jmark@gmail.com",
+        "password": "icecreams112"
+    }
+]
