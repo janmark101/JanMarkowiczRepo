@@ -218,6 +218,7 @@ class Game():
                 self.reset_map()
                 self.board = Board(self.screen, self.width_game, self.height_game, self.board_map)
                 self.board.count_points_funt()
+
             player_lives = self.player.lives
             player_score = self.player.full_score
             self.player = Player(self.screen,self.board_map,player_lives,player_score, self.width_game ,
@@ -370,13 +371,13 @@ class Game():
                     else:
                         self.Ghost_orange.get_pacman(player_pos,self.Ghost_orange.ghost_png)
 
-            if not self.player.power_up:
-                if list_of_objects[0].colliderect(list_of_objects[1]) or\
-                        list_of_objects[0].colliderect(list_of_objects[2]) or\
-                        list_of_objects[0].colliderect(list_of_objects[3]) or \
-                        list_of_objects[0].colliderect(list_of_objects[4]):
-                    self.player.lives -=1
-                    self.player_died = True
+            # if not self.player.power_up:
+            #     if list_of_objects[0].colliderect(list_of_objects[1]) or\
+            #             list_of_objects[0].colliderect(list_of_objects[2]) or\
+            #             list_of_objects[0].colliderect(list_of_objects[3]) or \
+            #             list_of_objects[0].colliderect(list_of_objects[4]):
+            #         self.player.lives -=1
+            #         self.player_died = True
 
             if self.player.lives <1:
                 self.screen = pygame.display.set_mode((self.width_menu,self.height_menu))

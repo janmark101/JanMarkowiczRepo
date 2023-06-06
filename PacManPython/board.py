@@ -46,4 +46,4 @@ class Board():
                 if self.board[i][j] == 1:
                     self.count_points +=1
 
-        print(self.count_points)
+
