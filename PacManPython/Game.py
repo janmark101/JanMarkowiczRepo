@@ -45,6 +45,7 @@ class Game():
         self.pattern_length = r"^.{4,12}$"
         self.special_chars_pattern = r"[^\w]+"
         self.map_choosen = False
+        self.options = False
         self.Menu()
 
     def Menu(self):
@@ -59,9 +60,10 @@ class Game():
         button_ok = Button( pygame.image.load( "buttons/button_ok.png" ) , (310 , 550) , self.screen )
         button_ok_map_1 = Button (pygame.image.load ("buttons/button_ok.png") , (125 , 600) , self.screen)
         button_ok_map_2 = Button (pygame.image.load ("buttons/button_ok.png") , (500 , 600) , self.screen)
+        button_config = Button(pygame.image.load("buttons/button_options.png"),(600,650),self.screen)
         while self.run:
 
-            if  not self.show_scoreboard and not self.Game_on and not self.map_choosen:
+            if  not self.show_scoreboard and not self.Game_on and not self.map_choosen and not self.options:
                 for event in pygame.event.get ():
                     if event.type == pygame.QUIT:
                         self.run = False
@@ -71,6 +73,8 @@ class Game():
                             self.screen = pygame.display.set_mode ((self.width_menu , self.height_menu))
                         if button_scoreboard.png_rect.collidepoint (event.pos):
                             self.show_scoreboard = True
+                        if button_config.png_rect.collidepoint(event.pos):
+                            self.options = True
 
             if self.show_scoreboard:
                 self.screen.fill("black")
@@ -84,6 +88,19 @@ class Game():
                     self.Show_scoreboard()
                     self.Button_back(button_back)
                     pygame.display.update ( )
+
+            elif self.options:
+                self.screen.fill ("black")
+                if self.options:
+                    for event in pygame.event.get ( ):
+                        if event.type == pygame.QUIT:
+                            self.run = False
+                        if event.type == pygame.MOUSEBUTTONDOWN:
+                            if button_back.png_rect.collidepoint (event.pos):
+                                self.options = False
+                    self.Button_back (button_back)
+                    self.show_options()
+                pygame.display.update ( )
 
             elif self.map_choosen:
                 self.screen.fill ("black")
@@ -116,7 +133,7 @@ class Game():
                 self.Start_game(button_ok)
 
             else:
-                self.buttons_menu(button_start_game,button_scoreboard)
+                self.buttons_menu(button_start_game,button_scoreboard,button_config)
                 pygame.display.update ( )
 
             clock.tick (60)
@@ -148,6 +165,45 @@ class Game():
         button_map_2.show_button ( )
         self.screen.blit (Map_1 , (20 , 250))
         self.screen.blit (Map_2 , (400 , 250))
+
+
+    def show_options(self):
+        keys = [ "Up" , "Down" , "Left" , "Rigth" ]
+        for i,key in enumerate(keys):
+            key_arrow = pygame.transform.scale (pygame.image.load (f"Config/{key}.png") , (60 , 60))
+            self.screen.blit (key_arrow , (50 , 190 + i *70))
+
+        self.screen.blit(pygame.image.load("Config/Options.png"),(200,30))
+
+        font = pygame.font.Font (None , 50)
+
+        for i,key in enumerate(keys):
+            text_surface = font.render (key , True , 'white')  ##fcc92e'
+            text_rect = text_surface.get_rect ( )
+            text_rect.topleft = (130 , 205 + i*70)
+            self.screen.blit (text_surface , text_rect)
+
+        text_position = [(480 , 205),(380 , 275),(450 , 345)]
+        text_list = ["Player lives :  3","Ghosts speed  :  [1,2,3]","Player speed  :  2"]
+
+        for i in range(3):
+            text_surface = font.render (text_list[i] , True , 'white')  ##fcc92e'
+            text_rect = text_surface.get_rect ( )
+            text_rect.topleft = text_position[i]
+            self.screen.blit (text_surface , text_rect)
+
+        rules_list = ["Player start game with 3 lives, when he hits ghost without having power",
+                      "up, he loses his life. If the player eats all points on the map, he goes up" ,
+                      "a level. Game has 3 levels that change the speed of the ghosts. When the ",
+                      "player dies or level up, the ghosts and the player reset their position."]
+
+        font = pygame.font.Font (None , 30)
+
+        for i in range(4):
+            text_surface = font.render (rules_list[i] , True , 'white')  ##fcc92e'
+            text_rect = text_surface.get_rect ( )
+            text_rect.topleft = (50,500 + i*40)
+            self.screen.blit (text_surface , text_rect)
 
     def Start_game(self,button):
         self.screen.fill("black")
@@ -325,7 +381,7 @@ class Game():
             if self.player.lives <1:
                 self.screen = pygame.display.set_mode((self.width_menu,self.height_menu))
                 self.save_player(button,self.player.full_score,"You died!")
-            print(self.player.eaten_points)
+
 
             if self.player.eaten_points >= self.board.count_points:
                 self.Level += 1
@@ -398,15 +454,16 @@ class Game():
 
         return list
 
-    def buttons_menu(self,button_start_game,button_scoreboard):
+    def buttons_menu(self,button_start_game,button_scoreboard,button_config):
         (x_mouse, y_mouse) = pygame.mouse.get_pos()
         button_start_game.enlarge_png(x_mouse, y_mouse, "buttons/big_button_start_game.png", 20, 5)
         button_scoreboard.enlarge_png(x_mouse, y_mouse, "buttons/big_button_scoreboard.png", 20, 5)
+        button_config.enlarge_png(x_mouse,y_mouse,"buttons/big_button_options.png", 10, 3)
         self.screen.fill("black")
         button_start_game.show_logo()
         button_start_game.show_button()
         button_scoreboard.show_button()
-        pygame.display.update()
+        button_config.show_button()
 
 
     def Show_scoreboard(self,text_x=180,text_y = 45,number=1):
