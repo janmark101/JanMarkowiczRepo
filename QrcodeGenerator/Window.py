@@ -1,10 +1,11 @@
 from tkinter import *
 from tkinter import messagebox
-from PIL import ImageTk, Image
+from PIL import ImageTk
 import qrcode
 from urllib.parse import urlparse
 import validators
 import requests
+
 class window(Tk):
     def __init__(self):
         super().__init__()
@@ -78,3 +79,5 @@ class window(Tk):
                 img = qr.make_image(fill_color="black", back_color='#b3e561')
                 self.show_qr(img)
                 img.save("qr_code.png")
+
+
