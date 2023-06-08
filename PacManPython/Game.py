@@ -371,13 +371,13 @@ class Game():
                     else:
                         self.Ghost_orange.get_pacman(player_pos,self.Ghost_orange.ghost_png)
 
-            # if not self.player.power_up:
-            #     if list_of_objects[0].colliderect(list_of_objects[1]) or\
-            #             list_of_objects[0].colliderect(list_of_objects[2]) or\
-            #             list_of_objects[0].colliderect(list_of_objects[3]) or \
-            #             list_of_objects[0].colliderect(list_of_objects[4]):
-            #         self.player.lives -=1
-            #         self.player_died = True
+            if not self.player.power_up:
+                if list_of_objects[0].colliderect(list_of_objects[1]) or\
+                        list_of_objects[0].colliderect(list_of_objects[2]) or\
+                        list_of_objects[0].colliderect(list_of_objects[3]) or \
+                        list_of_objects[0].colliderect(list_of_objects[4]):
+                    self.player.lives -=1
+                    self.player_died = True
 
             if self.player.lives <1:
                 self.screen = pygame.display.set_mode((self.width_menu,self.height_menu))
@@ -389,20 +389,6 @@ class Game():
                 self.Ghost_speed += 1
                 self.player_died = True
                 self.player_lvl_up = True
-
-            # if self.which_board == 1:
-            #     # if self.player.score / 10 >= 241:
-            #     #     self.Level += 1
-            #     #     self.Ghost_speed += 1
-            #     #     self.player_died = True
-            #     #     self.player_lvl_up = True
-            #
-            # if self.which_board == 2:
-            #     if self.player.score / 10 >= 265:
-            #         self.Level += 1
-            #         self.Ghost_speed += 1
-            #         self.player_died = True
-            #         self.player_lvl_up = True
 
 
         pygame.display.update ( )

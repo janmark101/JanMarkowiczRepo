@@ -47,3 +47,16 @@ class Board():
                     self.count_points +=1
 
 
+# if self.which_board == 1:
+            #     # if self.player.score / 10 >= 241:
+            #     #     self.Level += 1
+            #     #     self.Ghost_speed += 1
+            #     #     self.player_died = True
+            #     #     self.player_lvl_up = True
+            #
+            # if self.which_board == 2:
+            #     if self.player.score / 10 >= 265:
+            #         self.Level += 1
+            #         self.Ghost_speed += 1
+            #         self.player_died = True
+            #         self.player_lvl_up = True
