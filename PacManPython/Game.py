@@ -193,7 +193,7 @@ class Game():
             text_rect.topleft = text_position[i]
             self.screen.blit (text_surface , text_rect)
 
-        rules_list = ["Player start game with 3 lives, when he hits ghost without having power",
+        rules_list = ["Player starts game with 3 lives, when he hits ghost without having power",
                       "up, he loses his life. If the player eats all points on the map, he goes up" ,
                       "a level. Game has 3 levels that change the speed of the ghosts. When the ",
                       "player dies or level up, the ghosts and the player reset their position."]
@@ -203,7 +203,7 @@ class Game():
         for i in range(4):
             text_surface = font.render (rules_list[i] , True , 'white')  ##fcc92e'
             text_rect = text_surface.get_rect ( )
-            text_rect.topleft = (50,500 + i*40)
+            text_rect.topleft = (35,500 + i*40)
             self.screen.blit (text_surface , text_rect)
 
     def Start_game(self,button):
