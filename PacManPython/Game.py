@@ -61,7 +61,7 @@ class Game():
         button_ok = Button( pygame.image.load( "buttons/button_ok.png" ) , (310 , 550) , self.screen )
         button_ok_map_1 = Button (pygame.image.load ("buttons/button_ok.png") , (125 , 600) , self.screen)
         button_ok_map_2 = Button (pygame.image.load ("buttons/button_ok.png") , (500 , 600) , self.screen)
-        button_config = Button(pygame.image.load("buttons/button_options.png"),(600,650),self.screen)
+        button_config = Button(pygame.image.load("buttons/button_rules.png"),(600,650),self.screen)
         pygame.mouse.set_visible(False)
 
         while self.run:
@@ -174,7 +174,7 @@ class Game():
             key_arrow = pygame.transform.scale (pygame.image.load (f"Config/{key}.png") , (60 , 60))
             self.screen.blit (key_arrow , (50 , 190 + i *70))
 
-        self.screen.blit(pygame.image.load("Config/Options.png"),(200,30))
+        self.screen.blit(pygame.image.load("Config/Rules.png"),(260,30))
 
         font = pygame.font.Font (None , 50)
 
@@ -443,7 +443,7 @@ class Game():
         (x_mouse, y_mouse) = pygame.mouse.get_pos()
         button_start_game.enlarge_png(x_mouse, y_mouse, "buttons/big_button_start_game.png", 20, 5)
         button_scoreboard.enlarge_png(x_mouse, y_mouse, "buttons/big_button_scoreboard.png", 20, 5)
-        button_config.enlarge_png(x_mouse,y_mouse,"buttons/big_button_options.png", 10, 3)
+        button_config.enlarge_png(x_mouse,y_mouse,"buttons/big_button_rules.png", 10, 3)
         self.screen.fill("black")
         button_start_game.show_logo()
         button_start_game.show_button()
