@@ -46,11 +46,12 @@ class Game():
         self.special_chars_pattern = r"[^\w]+"
         self.map_choosen = False
         self.options = False
+        self.coursor = pygame.transform.scale(pygame.image.load("Config/coursor.png") , (25, 25))
         self.Menu()
+
 
     def Menu(self):
         clock = pygame.time.Clock ( )
-
         pygame.init()
         self.screen = pygame.display.set_mode ((self.width_menu, self.height_menu))
         pygame.display.set_caption ('Pac-Man')
@@ -61,8 +62,10 @@ class Game():
         button_ok_map_1 = Button (pygame.image.load ("buttons/button_ok.png") , (125 , 600) , self.screen)
         button_ok_map_2 = Button (pygame.image.load ("buttons/button_ok.png") , (500 , 600) , self.screen)
         button_config = Button(pygame.image.load("buttons/button_options.png"),(600,650),self.screen)
-        while self.run:
+        pygame.mouse.set_visible(False)
 
+        while self.run:
+            (x_mouse,y_mouse) = pygame.mouse.get_pos()
             if  not self.show_scoreboard and not self.Game_on and not self.map_choosen and not self.options:
                 for event in pygame.event.get ():
                     if event.type == pygame.QUIT:
@@ -87,6 +90,7 @@ class Game():
                                 self.show_scoreboard = False
                     self.Show_scoreboard()
                     self.Button_back(button_back)
+                    self.screen.blit (self.coursor , (x_mouse , y_mouse))
                     pygame.display.update ( )
 
             elif self.options:
@@ -100,6 +104,7 @@ class Game():
                                 self.options = False
                     self.Button_back (button_back)
                     self.show_options()
+                self.screen.blit (self.coursor , (x_mouse , y_mouse))
                 pygame.display.update ( )
 
             elif self.map_choosen:
@@ -127,6 +132,7 @@ class Game():
                                 self.game_objects ( )
 
                     self.choose_map(button_ok_map_1,button_ok_map_2)
+                    self.screen.blit (self.coursor , (x_mouse , y_mouse))
                     pygame.display.update ( )
 
             elif self.Game_on:
@@ -147,21 +153,16 @@ class Game():
 
     def choose_map(self,button_map_1,button_map_2):
         font = pygame.font.Font (None , 75)
-
         text_surface = font.render ("CHOOSE YOUR MAP" , True , '#fcc92e')
         text_rect = text_surface.get_rect ( )
         text_rect.topleft = (140 , 70)
         self.screen.blit (text_surface , text_rect)
-
         Map_1 = pygame.transform.scale(pygame.image.load("Maps/map_1.png"), (360,310))
         Map_2 = pygame.transform.scale(pygame.image.load("Maps/map_2.png"), (360,310))
         (x_mouse , y_mouse) = pygame.mouse.get_pos ( )
         button_map_1.enlarge_png (x_mouse , y_mouse , "buttons/big_button_ok.png" , 10 , 5)
-
         button_map_1.show_button ( )
-
         button_map_2.enlarge_png (x_mouse , y_mouse , "buttons/big_button_ok.png" , 10 , 5)
-
         button_map_2.show_button ( )
         self.screen.blit (Map_1 , (20 , 250))
         self.screen.blit (Map_2 , (400 , 250))
@@ -255,7 +256,6 @@ class Game():
             if self.player_lvl_up:
                 self.player.player_level_up()
                 self.Space_to_start()
-
 
         else:
 
@@ -383,13 +383,11 @@ class Game():
                 self.screen = pygame.display.set_mode((self.width_menu,self.height_menu))
                 self.save_player(button,self.player.full_score,"You died!")
 
-
             if self.player.eaten_points >= self.board.count_points:
                 self.Level += 1
                 self.Ghost_speed += 1
                 self.player_died = True
                 self.player_lvl_up = True
-
 
         pygame.display.update ( )
 
@@ -451,6 +449,7 @@ class Game():
         button_start_game.show_button()
         button_scoreboard.show_button()
         button_config.show_button()
+        self.screen.blit (self.coursor , (x_mouse , y_mouse))
 
 
     def Show_scoreboard(self,text_x=180,text_y = 45,number=1):
@@ -483,21 +482,22 @@ class Game():
     def Button_back(self,button_back):
         (x_mouse, y_mouse) = pygame.mouse.get_pos()
         button_back.enlarge_png(x_mouse, y_mouse, "buttons/big_back_button.png",10,5)
-
         button_back.show_button()
-
         pac_man_bg_image = pygame.transform.scale(pygame.image.load(self.Logo_path), (340, 140))
         self.screen.blit(pac_man_bg_image, (220, 630))
-
 
 
     def save_player(self,button_ok,player_full_score,win_or_lose):
         input_rect = pygame.Rect( 280 , 440 , 220 , 32 )
         color_active = pygame.Color( 'white' )
         color_passive = pygame.Color( '#444444' )
+        with self.Scoreboard_path.open ("r") as input_file:
+            data = json.load (input_file)
         color = color_passive
         good_length = False
         no_special_chars = False
+        already_exists = False
+
         while self.run:
             self.screen.fill( "black" )
             (x_mouse , y_mouse) = pygame.mouse.get_pos( )
@@ -506,33 +506,32 @@ class Game():
                     self.run = False
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if button_ok.png_rect.collidepoint( event.pos ):
-
                         if self.User_name != "":
-
+                            already_exists = self.check_user (data , self.User_name)
                             if re.match (self.pattern_length , self.User_name):
                                 if not re.search (self.special_chars_pattern , self.User_name):
                                     new_player = {"nick": self.User_name , "score": player_full_score}
-                                    with self.Scoreboard_path.open ("r") as input_file:
-                                        data = json.load (input_file)
 
-                                    data.append (new_player)
-
-                                    with self.Scoreboard_path.open ("w") as output_file:
-                                        json.dump (data , output_file , indent=4)
-
-                                    self.back_menu = True
-                                    self.Game_on = False
-                                    self.User_name = ""
                                     good_length = False
                                     no_special_chars = False
-                                    return
 
+                                    if already_exists is False:
+                                        data.append (new_player)
+
+                                        with self.Scoreboard_path.open ("w") as output_file:
+                                            json.dump (data , output_file , indent=4)
+
+                                        self.back_menu = True
+                                        self.Game_on = False
+                                        self.User_name = ""
+
+                                        return
                                 else:
                                     good_length = False
                                     no_special_chars = True
                             else:
+                                no_special_chars = False
                                 good_length = True
-
                         else:
                             self.back_menu = True
                             self.Game_on = False
@@ -567,6 +566,13 @@ class Game():
                 text_rect.topleft = (210 , 480)
                 self.screen.blit (text_surface , text_rect)
 
+            if already_exists:
+                font = pygame.font.Font (None , 25)
+
+                text_surface = font.render ("Name in use!" , True , '#fcc92e')
+                text_rect = text_surface.get_rect ( )
+                text_rect.topleft = (330 , 480)
+                self.screen.blit (text_surface , text_rect)
 
             font = pygame.font.Font( None , 75 )
 
@@ -582,7 +588,7 @@ class Game():
 
             text_surface = font.render( f"{player_full_score}" , True , '#fcc92e' )
             text_rect = text_surface.get_rect( )
-            text_rect.topleft = (330 , 245)
+            text_rect.topleft = (340 , 245)
             self.screen.blit( text_surface , text_rect )
 
             font = pygame.font.Font( None , 55 )
@@ -603,7 +609,7 @@ class Game():
 
             button_ok.enlarge_png( x_mouse , y_mouse , "buttons/big_button_ok.png" , 10 , 5 )
             button_ok.show_button( )
-
+            self.screen.blit (self.coursor , (x_mouse , y_mouse))
             pygame.display.update( )
 
     def Space_to_start(self):
@@ -612,4 +618,12 @@ class Game():
         text_rect = text_surface.get_rect ( )
         text_rect.topleft = (220, 500)
         self.screen.blit ( text_surface, text_rect )
+
+
+    def check_user(self,data,player):
+        for user in data:
+            if player == user[ 'nick' ]:
+                return True
+
+        return False
 
