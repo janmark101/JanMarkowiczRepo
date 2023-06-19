@@ -279,13 +279,25 @@ class Game():
             player_pos = self.player.show_animation()
 
             if self.Ghost_blue.in_box:
-                self.Ghost_blue.ghost_in_box()
+                if self.player.power_up:
+                    pass
+                else:
+                    self.Ghost_blue.ghost_in_box()
             if self.Ghost_red.in_box:
-                self.Ghost_red.ghost_in_box()
+                if self.player.power_up:
+                    pass
+                else:
+                    self.Ghost_red.ghost_in_box()
             if self.Ghost_pink.in_box:
-                self.Ghost_pink.ghost_in_box()
+                if self.player.power_up:
+                    pass
+                else:
+                    self.Ghost_pink.ghost_in_box()
             if self.Ghost_orange.in_box:
-                self.Ghost_orange.ghost_in_box()
+                if self.player.power_up:
+                    pass
+                else:
+                    self.Ghost_orange.ghost_in_box()
 
             if list_of_objects[0].colliderect(list_of_objects[1]) and self.player.power_up and not self.Ghost_blue.dead:
                 self.Ghost_blue.dead = True

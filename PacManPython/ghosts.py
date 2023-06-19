@@ -371,46 +371,49 @@ class Ghost(Board):
 
         self.availableMoves()
 
-        if self.random_direction == 2:
-            if self.avaible_moves[2]:
-                self.random_direction = 2
-            else:
-                if 0 in self.list_of_directions:
-                    self.list_of_directions.remove(0)
-                self.random_direction = random.choice(self.list_of_directions)
-        elif self.random_direction == 0:
-            if self.avaible_moves[0]:
-                self.random_direction = 0
-            else:
-                if 2 in self.list_of_directions:
-                    self.list_of_directions.remove(2)
-                self.random_direction = random.choice(self.list_of_directions)
-        elif self.random_direction == 1:
-            if self.avaible_moves[1]:
-                self.random_direction = 1
-            else:
-                if 3 in self.list_of_directions:
-                    self.list_of_directions.remove(3)
-                self.random_direction = random.choice(self.list_of_directions)
-        elif self.random_direction == 3:
-            if self.avaible_moves[3]:
-                self.random_direction = 3
-            else:
-                if 1 in self.list_of_directions:
-                    self.list_of_directions.remove(1)
+        if len(self.list_of_directions) ==0:
+             pass
+        else:
+            if self.random_direction == 2:
+                if self.avaible_moves[2]:
+                    self.random_direction = 2
+                else:
+                    if 0 in self.list_of_directions:
+                        self.list_of_directions.remove(0)
+                    self.random_direction = random.choice(self.list_of_directions)
+            elif self.random_direction == 0:
+                if self.avaible_moves[0]:
+                    self.random_direction = 0
+                else:
+                    if 2 in self.list_of_directions:
+                        self.list_of_directions.remove(2)
+                    self.random_direction = random.choice(self.list_of_directions)
+            elif self.random_direction == 1:
+                if self.avaible_moves[1]:
+                    self.random_direction = 1
+                else:
+                    if 3 in self.list_of_directions:
+                        self.list_of_directions.remove(3)
+                    self.random_direction = random.choice(self.list_of_directions)
+            elif self.random_direction == 3:
+                if self.avaible_moves[3]:
+                    self.random_direction = 3
+                else:
+                    if 1 in self.list_of_directions:
+                        self.list_of_directions.remove(1)
+                    self.random_direction = random.choice(self.list_of_directions)
+
+            if not self.avaible_moves[self.random_direction]:
                 self.random_direction = random.choice(self.list_of_directions)
 
-        if not self.avaible_moves[self.random_direction]:
-            self.random_direction = random.choice(self.list_of_directions)
-
-        if self.random_direction == 0 and self.avaible_moves[0]:
-                self.x += 1
-        if self.random_direction == 2 and self.avaible_moves[2]:
-                self.x -= 1
-        if self.random_direction == 1 and self.avaible_moves[1]:
-                self.y -= 1
-        if self.random_direction == 3 and self.avaible_moves[3]:
-                self.y += 1
+            if self.random_direction == 0 and self.avaible_moves[0]:
+                    self.x += 1
+            if self.random_direction == 2 and self.avaible_moves[2]:
+                    self.x -= 1
+            if self.random_direction == 1 and self.avaible_moves[1]:
+                    self.y -= 1
+            if self.random_direction == 3 and self.avaible_moves[3]:
+                    self.y += 1
 
         self.screen.blit(self.power_up_ghost, (self.x, self.y))
 
