@@ -5,7 +5,7 @@ from board import Board
 
 
 class Player(Board):
-    def __init__(self,screen,board,lives,score_,width,height):
+    def __init__(self,screen,board,lives,score_,width,height,eaten_points):
         super().__init__(screen,width,height,board)
         self.player_list = [pygame.transform.scale(pygame.image.load(i), (45, 45)) for i in glob.glob("player_png/*.png")]
         self.counter = 0
@@ -25,7 +25,7 @@ class Player(Board):
         self.player_rect = self.player_list[0].get_rect()
         self.player_rect.center = (430,664)
         self.player_speed = 2
-        self.eaten_points = 0
+        self.eaten_points = eaten_points
 
 
     def set_direction(self,direct):
